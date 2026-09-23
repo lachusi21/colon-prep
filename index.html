@@ -567,6 +567,24 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   .tl-item.k-line,
   .tl-item.k-call{display:none!important}
 
+  /* 補水那一整個階段收進抬頭；用藥與聯絡改用底部的壓縮條 */
+  #schedule .phase:first-of-type{display:none}
+  .sec-drug,.sec-contact{display:none!important}
+  .ph-water{margin-top:1.2mm;font-size:10.5pt}
+  .ph-water b{color:var(--accent)}
+  .print-foot{
+    display:flex;gap:3mm;align-items:center;margin-top:2.5mm;
+    border:.8pt solid var(--line);border-radius:1.5mm;padding:1.6mm 2.5mm;break-inside:avoid;
+  }
+  .pf-qr{width:15mm;height:15mm;flex:0 0 auto}
+  .pf-qr img,.pf-qr canvas{width:15mm;height:15mm;display:block}
+  .pf-text{flex:1;min-width:0}
+  .pf-text p{font-size:9pt;line-height:1.38;margin-top:.7mm}
+  .pf-text p:first-child{margin-top:0}
+  .pf-text b{color:var(--accent)}
+  .pf-fine{font-size:8pt;color:var(--ink-3)}
+  .pf-fine b{color:var(--ink-3)}
+
   /* 自主飲食的食物改用圖示橫幅 */
   .fstrip{display:grid;gap:1.4mm;margin-top:1.6mm}
   .fs-card{text-align:center;border:.5pt solid var(--line);background:var(--surface-2);border-radius:1.2mm;padding:.8mm .4mm .6mm;break-inside:avoid}
@@ -642,6 +660,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   <div class="print-head">
     <div class="ph-clinic">周中凱腸胃內科診所　清腸衛教指引</div>
     <div class="ph-meta" id="phMeta"></div>
+    <div class="ph-water" id="phWater"></div>
   </div>
 
   <header class="masthead">
@@ -753,7 +772,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   </section>
 
   <!-- 用藥 -->
-  <section>
+  <section class="sec-drug">
     <div class="sec-head">
       <span class="eyebrow">用藥</span>
       <h2>原本在吃的藥怎麼辦</h2>
@@ -815,7 +834,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   </section>
 
   <!-- 求助 -->
-  <section>
+  <section class="sec-contact">
     <div class="sec-head">
       <span class="eyebrow">聯絡</span>
       <h2>有疑問就問，不要自己猜</h2>
@@ -880,6 +899,16 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     <p class="print-note" id="printNote">A4 直式，約 2 頁。補水的杯子會印成空格，喝完一杯自己打勾。</p>
   </section>
 
+  <!-- 紙本上用藥與聯絡壓成一條，取代整個區塊 -->
+  <div class="print-foot print-only">
+    <div class="pf-qr" id="qrPrint" aria-hidden="true"></div>
+    <div class="pf-text">
+      <p><b>用藥</b>　口服 GLP-1 與瘦瘦針停藥一週｜緩解便秘藥物請勿停藥｜降血糖藥與抗凝血劑依醫師指示｜其他藥品於服用清腸劑前 2 小時或清腸後 6 小時服用</p>
+      <p><b>有問題</b>　診所 Line <b>@420genld</b>　｜　24 小時免付費諮詢專線 <b>0800-060-689</b></p>
+      <p class="pf-fine">以上為一般做法，若醫師另有指示，仍以醫師指示為準。</p>
+    </div>
+  </div>
+
   <footer>
     <p>本頁為周中凱腸胃內科診所清腸衛教參考，依保可淨與易暢淨原廠說明編寫。若醫師另有指示，一律以醫師指示為準。檢查相關問題請透過診所 Line（@420genld）詢問。</p>
   </footer>
@@ -896,6 +925,12 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
       new QRCode(document.getElementById("qr"), {
         text: "https://line.me/R/ti/p/%40420genld",
         width: 132, height: 132,
+        colorDark: "#000000", colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+      new QRCode(document.getElementById("qrPrint"), {
+        text: "https://line.me/R/ti/p/%40420genld",
+        width: 96, height: 96,
         colorDark: "#000000", colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
@@ -1416,6 +1451,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   var printBtn = document.getElementById("printBtn");
   var printNote = document.getElementById("printNote");
   var phMeta = document.getElementById("phMeta");
+  var phWater = document.getElementById("phWater");
   var NOTE_DEFAULT = printNote.textContent;
 
   function updatePrintHead(){
@@ -1423,6 +1459,10 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     phMeta.textContent = exam
       ? "檢查日期：" + fmtDate(exam) + " 上午　·　飲食方式：" + (state.useMeal ? "易暢淨低渣代餐" : "自主飲食控制")
       : "檢查日期：＿＿＿＿＿＿　·　飲食方式：" + (state.useMeal ? "易暢淨低渣代餐" : "自主飲食控制");
+    /* 「檢查前一週補水」在紙本上只是一句話，收進抬頭省掉一整個階段 */
+    phWater.innerHTML = exam
+      ? "檢查前一週（" + fmtDate(dayOf(exam, -7)) + "）起，每天補足 <b>1500～2000 c.c.</b> 水分。"
+      : "";
   }
 
   printBtn.addEventListener("click", function(){
