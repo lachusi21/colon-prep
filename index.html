@@ -487,6 +487,23 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 .print-note.warn{color:var(--danger);font-weight:500}
 .print-note b{color:var(--ink)}
 .print-note .btn{margin-left:10px;vertical-align:middle}
+.print-actions{display:flex;gap:12px;flex-wrap:wrap}
+.print-btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent);box-shadow:none}
+:root[data-theme="dark"] .print-btn.ghost{color:var(--accent)}
+.print-btn.ghost:hover{background:var(--accent-wash)}
+.print-btn[disabled]{opacity:.55;cursor:default}
+
+/* 產生出來的時程圖 */
+.sheet-out{margin-top:20px}
+.sheet-hint{
+  font-size:15.5px;color:var(--ink);background:var(--accent-wash);
+  border-radius:10px;padding:11px 15px;line-height:1.7;
+}
+.sheet-hint b{color:var(--accent)}
+.sheet-out img{
+  display:block;width:100%;height:auto;margin-top:12px;
+  border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+}
 
 @media print{
   @page{size:A4 portrait;margin:11mm}
@@ -905,10 +922,18 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     <div class="sec-head">
       <span class="eyebrow">帶回家</span>
       <h2>印一份紙本貼在冰箱上</h2>
-      <p class="sec-sub">填好上面的檢查日期之後，按下面的按鈕會印出<b>屬於你的時程表</b>，日期都已經換算好。手機也可以按，選「存成 PDF」就能存在手機裡。</p>
+      <p class="sec-sub">填好上面的檢查日期之後，按<b>存成圖片</b>會做出一張屬於你的時程表，長按就能存進手機相簿——<b>用 Line 開啟也可以存</b>。要印在紙上就按「列印 A4」。</p>
     </div>
-    <button type="button" class="print-btn" id="printBtn">列印我的清腸時程</button>
+    <div class="print-actions">
+      <button type="button" class="print-btn" id="imgBtn">存成圖片</button>
+      <button type="button" class="print-btn ghost" id="printBtn">列印 A4</button>
+    </div>
     <p class="print-note" id="printNote">A4 直式，約 2 頁。補水的杯子會印成空格，喝完一杯自己打勾。</p>
+
+    <div class="sheet-out" id="sheetOut" hidden>
+      <p class="sheet-hint" id="sheetHint"></p>
+      <img id="sheetImg" alt="你的清腸時程表">
+    </div>
   </section>
 
   <!-- 紙本上用藥與聯絡壓成一條，取代整個區塊 -->
@@ -1518,6 +1543,117 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     printNote.innerHTML = NOTE_DEFAULT +
       "<br><b>用 Line 開啟的話要先切換瀏覽器</b>：點右上角 <b>⋯</b> →「用其他瀏覽器開啟」。";
   }
+
+  /* ---------- 存成圖片 ----------
+     Line 內建瀏覽器不能列印、也擋下載，但「長按圖片存到相簿」是瀏覽器原生功能，
+     WebView 擋不掉。所以把列印版整張畫成圖片顯示在頁面上讓病人長按儲存。 */
+
+  var imgBtn = document.getElementById("imgBtn");
+  var sheetOut = document.getElementById("sheetOut");
+  var sheetHint = document.getElementById("sheetHint");
+  var sheetImg = document.getElementById("sheetImg");
+  var asPrintReady = false;
+
+  function loadScript(src){
+    return new Promise(function(res, rej){
+      var t = document.createElement("script");
+      t.src = src; t.onload = res; t.onerror = rej;
+      document.head.appendChild(t);
+    });
+  }
+
+  /* 把 @media print 的規則複製一份成 .as-print，才能在螢幕上套用同一套版型，
+     由同一份來源產生，不會跟列印版走鐘 */
+  function buildAsPrintCSS(){
+    if (asPrintReady) return;
+    var txt = "", styles = document.querySelectorAll("style");
+    for (var n = 0; n < styles.length; n++) {
+      if (styles[n].textContent.indexOf("@media print{") >= 0) { txt = styles[n].textContent; break; }
+    }
+    var i = txt.indexOf("@media print{");
+    if (i < 0) return;
+    var start = txt.indexOf("{", i) + 1, depth = 1, j = start;
+    while (j < txt.length && depth > 0) {
+      if (txt[j] === "{") depth++;
+      else if (txt[j] === "}") depth--;
+      j++;
+    }
+    var body = txt.slice(start, j - 1);
+
+    function prefix(sel){
+      return sel.split(",").map(function(one){
+        one = one.trim();
+        if (!one) return "";
+        if (/^(:root|html|body)\b/.test(one)) return one.replace(/^(:root|html|body)/, ".as-print");
+        return ".as-print " + one;
+      }).filter(Boolean).join(",");
+    }
+
+    var out = [], buf = "", d = 0, sel = "";
+    for (var k = 0; k < body.length; k++) {
+      var ch = body[k];
+      if (ch === "{") { if (d === 0) { sel = buf.trim(); buf = ""; } else buf += ch; d++; }
+      else if (ch === "}") {
+        d--;
+        if (d === 0) { if (sel && sel.charAt(0) !== "@") out.push(prefix(sel) + "{" + buf + "}"); buf = ""; sel = ""; }
+        else buf += ch;
+      } else buf += ch;
+    }
+    /* 螢幕上要固定成 A4 內容寬度（210mm 減去左右邊界），圖片比例才會對 */
+    out.push(".as-print .wrap{width:718px;max-width:718px;margin:0;padding:0}");
+
+    var st = document.createElement("style");
+    st.textContent = out.join("\n");
+    document.head.appendChild(st);
+    asPrintReady = true;
+  }
+
+  imgBtn.addEventListener("click", function(){
+    if (!examDateObj()) {
+      printNote.textContent = "請先在上面填入檢查日期，圖片上的時程才會有日期。";
+      printNote.className = "print-note warn";
+      el.date.scrollIntoView({ block: "center" });
+      el.date.focus();
+      return;
+    }
+    imgBtn.disabled = true;
+    imgBtn.textContent = "產生中…";
+
+    loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js")
+      .then(function(){
+        buildAsPrintCSS();
+        var root = document.documentElement;
+        root.classList.add("as-print");
+        return new Promise(function(res){ setTimeout(res, 120); })
+          .then(function(){
+            return html2canvas(document.querySelector(".wrap"), {
+              backgroundColor: "#ffffff",
+              scale: 2,
+              useCORS: true,
+              windowWidth: 800,
+              logging: false
+            });
+          })
+          .then(function(canvas){
+            root.classList.remove("as-print");
+            sheetImg.src = canvas.toDataURL("image/jpeg", 0.92);
+            sheetHint.innerHTML = inApp
+              ? "<b>長按下面的圖片</b>，選「儲存圖片」就會存到手機相簿。"
+              : "<b>長按圖片</b>（手機）或<b>按右鍵另存新檔</b>（電腦）就能存下來。";
+            sheetOut.hidden = false;
+            sheetOut.scrollIntoView({ block: "start" });
+          })
+          .catch(function(e){ root.classList.remove("as-print"); throw e; });
+      })
+      .catch(function(){
+        printNote.textContent = "圖片產生失敗，請改用「列印 A4」，或確認網路連線後再試一次。";
+        printNote.className = "print-note warn";
+      })
+      .then(function(){
+        imgBtn.disabled = false;
+        imgBtn.textContent = "存成圖片";
+      });
+  });
 
   /* 時程表裡的連結：跳過去時順便把摺疊的超商清單展開 */
   document.addEventListener("click", function(e){
