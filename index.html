@@ -396,6 +396,7 @@ td b{color:var(--danger)}
 .fbox strong{color:var(--ink)}
 
 /* ── 超商篇（點開才展開，預設收起來不佔版面） ── */
+.store[hidden]{display:none}
 .store{
   margin-top:20px;background:var(--surface);border:1px solid var(--line);
   border-radius:14px;box-shadow:var(--shadow);overflow:hidden;
@@ -993,7 +994,8 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     reset: document.getElementById("reset"),
     dietTitle: document.getElementById("dietTitle"),
     dietSub: document.getElementById("dietSub"),
-    dietBody: document.getElementById("dietBody")
+    dietBody: document.getElementById("dietBody"),
+    store: document.getElementById("store")
   };
 
   function pad(n){ return n < 10 ? "0" + n : "" + n; }
@@ -1425,6 +1427,11 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   }
 
   function renderDiet(){
+    /* 代餐組前二天照常吃、前一天吃代餐，沒有一天要自己準備低渣食物，
+       超商清單對他們是多餘的，只留給自主飲食組。 */
+    el.store.open = false;
+    el.store.hidden = state.useMeal;
+
     var fluidNote = '<p class="foodline">只能喝<strong>透光、看得見杯子對面手指</strong>的液體，而且<strong>料一律不能吃</strong>——菜湯的菜、魚湯的魚、肉湯的肉都要濾掉。</p>';
 
     if (state.useMeal) {
