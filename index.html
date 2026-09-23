@@ -250,6 +250,10 @@ input[type="date"],input[type="time"]{
 .card li::marker{color:var(--accent)}
 .card strong{color:var(--ink)}
 .card.hi{border-color:var(--accent);border-width:1.5px;padding:14px 16px}
+.stop-line strong{
+  color:var(--danger);display:inline-block;margin-right:.5em;
+  padding:1px 9px;border-radius:6px;background:var(--danger-wash);font-size:15px;
+}
 
 /* 保可淨沖泡 */
 .brew{margin-top:12px;background:var(--accent-wash);border-radius:10px;padding:14px 16px}
@@ -752,7 +756,9 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     chowder: bowl('#F7F1E2', dot(27,29,2.2,'#EADFC2') + dot(35,30.4,2,'#EADFC2') + dot(42,28.6,1.8,'#EADFC2'))
   };
 
-  /* 飲食區塊用的文字版，避免跟時程表裡的圖示重複 */
+  /* 時程表與飲食區塊共用，改一次兩邊同步 */
+  var STOP_LIST = "所有蔬菜、水果、油炸食物、牛奶、豆漿等奶製品、糙米、燕麥、玉米、地瓜等全穀雜糧、堅果、芝麻、薏仁、紅豆、綠豆。";
+
   function foodText(list){
     return '<p class="foodline">' + list.map(function(f){
       return f.n + (f.s ? '（' + f.s.replace(/<br>/g, '，') + '）' : '');
@@ -889,7 +895,8 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         date: fmtDate(dayOf(exam, -2)),
         items: [
           item("", "全天", "", "開始低渣飲食",
-            "<p>這一天起<strong>只能吃</strong>下列食物：</p>" + foodText(LOW_RESIDUE))
+            "<p>這一天起<strong>只能吃</strong>下列食物：</p>" + foodText(LOW_RESIDUE) +
+            "<p class=\"stop-line\"><strong>一律停掉</strong>" + STOP_LIST + "</p>")
         ]
       });
       var si = [
@@ -1044,7 +1051,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         '<div class="fbox">' +
           '<p class="fsub">前二天　只可以吃</p>' + foodGrid(LOW_RESIDUE) +
           '<p class="fsub stop">前二天　一律停掉</p>' +
-          '<p class="foodline">所有蔬菜、水果、油炸食物、牛奶、豆漿等奶製品、糙米、燕麥、玉米、地瓜等全穀雜糧、堅果、芝麻、薏仁、紅豆、綠豆。</p>' +
+          '<p class="foodline">' + STOP_LIST + '</p>' +
           '<p class="fsub">前一天　只能喝無渣流質</p>' + fluidNote + foodGrid(CLEAR_FLUIDS) +
         '</div>';
     }
