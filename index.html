@@ -319,6 +319,8 @@ input[type="date"],input[type="time"]{
   display:flex;align-items:center;justify-content:center;
 }
 .ftile svg{width:100%;height:100%;display:block}
+/* 在白底的飲食區塊裡，圖示格要有底色才看得出是一格一格 */
+.fbox .ftile{background:var(--surface-2)}
 .flabel{margin-top:8px;font-size:15px;line-height:1.45;color:var(--ink);font-weight:500}
 .flabel small{display:block;font-size:13px;font-weight:400;color:var(--ink-3);margin-top:1px}
 .foodline{margin-top:10px;font-size:16.5px;line-height:1.95;color:var(--ink-2)}
@@ -878,7 +880,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         item("", "全天", "", "改吃易暢淨低渣代餐（四餐）",
           "<p>依盒內指示，每餐擇一加熱：<strong>微波 2 分鐘</strong>，或連鋁箔袋放入沸水<strong>隔水加熱 5 分鐘</strong>後倒出。下午點心可搭配無渣飲料。</p>" +
           "<p><strong>四餐都必須在 16:00 前吃完</strong>，時間可依自己的作息調整。</p>" +
-          foodGrid(EZ_MEALS) + mealsHTML())
+          foodText(EZ_MEALS) + mealsHTML())
       ];
       P.push({ label:"檢查前一天", date: fmtDate(dayOf(exam, -1)), items: mi.concat(eveningItems()) });
     } else {
@@ -887,12 +889,12 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         date: fmtDate(dayOf(exam, -2)),
         items: [
           item("", "全天", "", "開始低渣飲食",
-            "<p>這一天起<strong>只能吃</strong>下列食物：</p>" + foodGrid(LOW_RESIDUE))
+            "<p>這一天起<strong>只能吃</strong>下列食物：</p>" + foodText(LOW_RESIDUE))
         ]
       });
       var si = [
         item("", "全天", "", "只可飲用無渣流質飲食",
-          "<p>這一天<strong>不再吃任何固體食物</strong>，只喝清澈飲料與澄清湯：</p>" + foodGrid(CLEAR_FLUIDS))
+          "<p>這一天<strong>不再吃任何固體食物</strong>，只喝清澈飲料與澄清湯：</p>" + foodText(CLEAR_FLUIDS))
       ];
       P.push({ label:"檢查前一天", date: fmtDate(dayOf(exam, -1)), items: si.concat(eveningItems()) });
     }
@@ -1030,20 +1032,20 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         '<div class="fbox">' +
           '<p class="fsub">前二天</p>' +
           '<p class="foodline">一般正常飲食，不需特別限制。</p>' +
-          '<p class="fsub">前一天　易暢淨四餐</p>' + foodText(EZ_MEALS) +
+          '<p class="fsub">前一天　易暢淨四餐</p>' + foodGrid(EZ_MEALS) +
           '<p class="fsub">加熱方式（擇一）</p>' +
           '<p class="foodline">撕開鋁箔，倒出內容物於容器中<strong>微波加熱 2 分鐘</strong>；或將鋁箔袋放入沸騰開水<strong>隔水加熱 5 分鐘</strong>後再撕開倒出。下午點心的手工餅乾可搭配無渣飲料。四餐粗纖維總重量僅 0.095g。</p>' +
-          '<p class="fsub">喝的東西　無渣流質</p>' + fluidNote + foodText(CLEAR_FLUIDS) +
+          '<p class="fsub">喝的東西　無渣流質</p>' + fluidNote + foodGrid(CLEAR_FLUIDS) +
         '</div>';
     } else {
       el.dietTitle.textContent = "自主飲食控制";
       el.dietSub.innerHTML = "檢查前<b>二天</b>開始低渣飲食，檢查前<b>一天</b>只喝無渣流質。";
       el.dietBody.innerHTML =
         '<div class="fbox">' +
-          '<p class="fsub">前二天　只可以吃</p>' + foodText(LOW_RESIDUE) +
+          '<p class="fsub">前二天　只可以吃</p>' + foodGrid(LOW_RESIDUE) +
           '<p class="fsub stop">前二天　一律停掉</p>' +
           '<p class="foodline">所有蔬菜、水果、油炸食物、牛奶、豆漿等奶製品、糙米、燕麥、玉米、地瓜等全穀雜糧、堅果、芝麻、薏仁、紅豆、綠豆。</p>' +
-          '<p class="fsub">前一天　只能喝無渣流質</p>' + fluidNote + foodText(CLEAR_FLUIDS) +
+          '<p class="fsub">前一天　只能喝無渣流質</p>' + fluidNote + foodGrid(CLEAR_FLUIDS) +
         '</div>';
     }
   }
