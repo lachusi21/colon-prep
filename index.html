@@ -1608,6 +1608,73 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     asPrintReady = true;
   }
 
+  /* 離屏複製一份再拍，才不會把手機上的版面撐爛。
+     複製節點不會帶走 canvas 的畫面，所以 QR 要另外換成圖片。 */
+  function renderSheet(){
+    var holder = document.createElement("div");
+    holder.className = "as-print";
+    holder.style.cssText = "position:fixed;left:-10000px;top:0;width:718px;background:#fff";
+
+    var src = document.querySelector(".wrap");
+    var clone = src.cloneNode(true);
+    holder.appendChild(clone);
+    document.body.appendChild(holder);
+
+    var srcCv = src.querySelectorAll("canvas");
+    var dstCv = clone.querySelectorAll("canvas");
+    for (var i = 0; i < dstCv.length && i < srcCv.length; i++) {
+      try {
+        var im = new Image();
+        im.src = srcCv[i].toDataURL("image/png");
+        im.className = dstCv[i].className;
+        im.style.cssText = dstCv[i].style.cssText;
+        dstCv[i].parentNode.replaceChild(im, dstCv[i]);
+      } catch (e) {}
+    }
+
+    return new Promise(function(res){ setTimeout(res, 150); })
+      .then(function(){
+        return html2canvas(clone, { backgroundColor: "#ffffff", scale: 2, useCORS: true, logging: false });
+      })
+      .then(function(canvas){ holder.remove(); return canvas; })
+      .catch(function(e){ holder.remove(); throw e; });
+  }
+
+  function canvasToBlob(canvas){
+    return new Promise(function(res){
+      if (canvas.toBlob) canvas.toBlob(res, "image/jpeg", 0.92);
+      else res(null);
+    });
+  }
+
+  /* iOS 的 WebView 長按 data: 圖片不會給「儲存影像」，所以優先走系統分享面板，
+     那裡面才有「儲存影像」。不支援的裝置再退回長按。 */
+  function offerSave(canvas, blob){
+    var file = null;
+    try {
+      if (blob && window.File) file = new File([blob], "清腸時程.jpg", { type: "image/jpeg" });
+    } catch (e) {}
+
+    var canShare = !!(file && navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share);
+    sheetImg.src = canvas.toDataURL("image/jpeg", 0.92);
+    sheetOut.hidden = false;
+
+    if (canShare) {
+      sheetHint.innerHTML =
+        "按下面的<b>儲存到手機</b>，在跳出的選單選「<b>儲存影像</b>」就會存進相簿。" +
+        "<button type=\"button\" class=\"btn\" id=\"shareBtn\">儲存到手機</button>";
+      var sb = document.getElementById("shareBtn");
+      sb.addEventListener("click", function(){
+        navigator.share({ files: [file], title: "清腸時程" }).catch(function(){});
+      });
+    } else {
+      sheetHint.innerHTML = inApp
+        ? "<b>長按下面的圖片</b>選「儲存圖片」。如果長按沒有反應，點右上角 <b>⋯</b> 用其他瀏覽器開啟這一頁再試。"
+        : "<b>長按圖片</b>（手機）或<b>按右鍵另存新檔</b>（電腦）就能存下來。";
+    }
+    sheetOut.scrollIntoView({ block: "start" });
+  }
+
   imgBtn.addEventListener("click", function(){
     if (!examDateObj()) {
       printNote.textContent = "請先在上面填入檢查日期，圖片上的時程才會有日期。";
@@ -1620,30 +1687,9 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     imgBtn.textContent = "產生中…";
 
     loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js")
-      .then(function(){
-        buildAsPrintCSS();
-        var root = document.documentElement;
-        root.classList.add("as-print");
-        return new Promise(function(res){ setTimeout(res, 120); })
-          .then(function(){
-            return html2canvas(document.querySelector(".wrap"), {
-              backgroundColor: "#ffffff",
-              scale: 2,
-              useCORS: true,
-              windowWidth: 800,
-              logging: false
-            });
-          })
-          .then(function(canvas){
-            root.classList.remove("as-print");
-            sheetImg.src = canvas.toDataURL("image/jpeg", 0.92);
-            sheetHint.innerHTML = inApp
-              ? "<b>長按下面的圖片</b>，選「儲存圖片」就會存到手機相簿。"
-              : "<b>長按圖片</b>（手機）或<b>按右鍵另存新檔</b>（電腦）就能存下來。";
-            sheetOut.hidden = false;
-            sheetOut.scrollIntoView({ block: "start" });
-          })
-          .catch(function(e){ root.classList.remove("as-print"); throw e; });
+      .then(function(){ buildAsPrintCSS(); return renderSheet(); })
+      .then(function(canvas){
+        return canvasToBlob(canvas).then(function(blob){ offerSave(canvas, blob); });
       })
       .catch(function(){
         printNote.textContent = "圖片產生失敗，請改用「列印 A4」，或確認網路連線後再試一次。";
