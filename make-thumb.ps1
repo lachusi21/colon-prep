@@ -75,3 +75,21 @@ $g.DrawString('LINE  @420genld', $fontFoot, $dimWhite, ($PAD - 4), ($H - $PAD - 
 $bmp.Save($outP, [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose()
 Write-Output ("thumb.png  {0}x{1}" -f $W, $H)
+
+# --- favicon: the first doctor's head on a teal square ----------------------
+$ICO = 512
+$ib = New-Object System.Drawing.Bitmap($ICO, $ICO, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+$ig = [System.Drawing.Graphics]::FromImage($ib)
+$ig.SmoothingMode     = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+$ig.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+$ig.Clear($teal)
+$face = [System.Drawing.Bitmap]::FromFile((Join-Path $dir 'mascot-a.png'))
+# her head sits at roughly x4..141, y22..148 inside the 190x238 cut-out
+$scale = 330.0 / 126.0
+$ig.DrawImage($face,
+    [int]($ICO / 2 - 72 * $scale), [int]($ICO * 0.46 - 85 * $scale),
+    [int]($face.Width * $scale), [int]($face.Height * $scale))
+$face.Dispose()
+$ib.Save((Join-Path $dir 'icon.png'), [System.Drawing.Imaging.ImageFormat]::Png)
+$ig.Dispose(); $ib.Dispose()
+Write-Output ("icon.png   {0}x{0}" -f $ICO)
