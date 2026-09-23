@@ -310,6 +310,16 @@ input[type="date"],input[type="time"]{
 /* 只在列印時出現的內容（代餐橫幅、含軟便藥的完整步驟） */
 .print-only{display:none}
 
+/* 跳到超商清單的連結 */
+.store-link{
+  display:inline-flex;align-items:center;gap:7px;margin-top:4px;
+  font-size:15.5px;font-weight:500;color:var(--accent);text-decoration:none;
+  background:var(--accent-wash);border-radius:99px;padding:7px 15px;
+}
+.store-link::after{content:"↓";font-family:var(--mono);font-weight:700}
+.store-link:hover{background:var(--accent);color:var(--surface)}
+:root[data-theme="dark"] .store-link:hover{color:#0C1A1B}
+
 /* ── 飲食說明（單一區塊，用小標分段） ── */
 .fboxes{display:flex;flex-direction:column;gap:20px}
 .fbox{
@@ -726,7 +736,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     </div>
     <div id="dietBody"></div>
 
-    <details class="store">
+    <details class="store" id="store">
       <summary>在超商買得到的低渣食物<span class="store-cue">點開看清單</span></summary>
       <div class="store-body">
         <p class="foodline">不想自己準備的話，以下都是便利商店就買得到的低渣選擇。<strong>檢查前一天起就不能再吃固體食物</strong>，這些只適用於低渣飲食那幾天。</p>
@@ -1259,7 +1269,8 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
           item("", "全天", "", "開始低渣飲食",
             "<p>這一天起<strong>只能吃</strong>下列食物：</p>" +
             '<div class="screen-only">' + foodText(LOW_RESIDUE) + '</div>' + foodStrip(LOW_RESIDUE, 8) +
-            "<p class=\"stop-line\"><strong>一律停掉</strong>" + STOP_LIST + "</p>")
+            "<p class=\"stop-line\"><strong>一律停掉</strong>" + STOP_LIST + "</p>" +
+            "<p class=\"screen-only\"><a class=\"store-link\" href=\"#store\">不想自己準備？看超商買得到的低渣食物</a></p>")
         ]
       });
       var si = [
@@ -1476,6 +1487,14 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     printNote.textContent = NOTE_DEFAULT;
     printNote.className = "print-note";
     window.print();
+  });
+
+  /* 時程表裡的連結：跳過去時順便把摺疊的超商清單展開 */
+  document.addEventListener("click", function(e){
+    var a = e.target.closest && e.target.closest('a[href="#store"]');
+    if (!a) return;
+    var d = document.getElementById("store");
+    if (d) d.open = true;
   });
 
   el.date.addEventListener("change", renderSchedule);
