@@ -293,18 +293,27 @@ input[type="date"],input[type="time"]{
 .hy-hint{margin-top:11px;font-size:15px;color:var(--ink-2);line-height:1.75}
 .hy-hint b{color:var(--ink)}
 
-/* 代餐 */
-.meals{display:flex;flex-direction:column;gap:9px;margin-top:11px}
-.meal{
-  display:flex;align-items:center;gap:12px;background:var(--surface-2);
-  border-radius:9px;padding:9px 12px;flex-wrap:wrap;
+/* 代餐四餐：橫幅四格 */
+.mstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.ms-card{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:13px;
+  padding:12px 10px 11px;text-align:center;min-width:0;
 }
-.meal input[type="time"]{width:118px;flex:0 0 auto;font-size:16px;padding:8px 10px;background:var(--surface)}
-.meal-n{flex:1;min-width:140px;font-size:16.5px;line-height:1.5}
-.meal-n b{display:block;font-size:14px;color:var(--ink-3);font-weight:500}
-.kcal{font-family:var(--mono);font-size:13px;color:var(--ink-3);flex:0 0 auto}
-.meal.late{background:var(--danger-wash)}
-.meal.late .meal-n b{color:var(--danger)}
+.ms-icon{
+  width:100%;max-width:62px;aspect-ratio:1;margin:0 auto;padding:7px;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+}
+.ms-icon svg{width:100%;height:100%;display:block}
+.ms-meal{margin-top:9px;font-size:13px;font-weight:500;color:var(--accent);letter-spacing:.04em}
+.ms-name{margin-top:2px;font-size:16px;font-weight:700;line-height:1.35}
+.ms-g{margin-top:3px;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.ms-card input[type="time"]{
+  width:100%;margin-top:10px;text-align:center;font-size:16px;padding:7px 4px;
+  background:var(--surface);
+}
+.ms-late{margin-top:6px;font-size:12px;font-weight:700;color:var(--danger)}
+.ms-card.late{background:var(--danger-wash);border-color:color-mix(in srgb,var(--danger) 35%,transparent)}
+@media (max-width:560px){.mstrip{grid-template-columns:repeat(2,1fr)}}
 
 /* ── 飲食說明（單一區塊，用小標分段） ── */
 .fboxes{display:flex;flex-direction:column;gap:20px}
@@ -539,18 +548,19 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   }
   .hy-hint{font-size:8pt;margin-top:1mm;line-height:1.3}
 
-  /* 代餐時間是輸入框，列印時要拆掉表單外觀才不會佔一大格 */
-  .meals{margin-top:1.5mm;gap:.6mm}
-  .meal,.meal.late{background:none;padding:0;gap:2mm;flex-wrap:nowrap}
-  .meal input[type="time"]{
-    width:auto;min-width:0;flex:0 0 auto;border:0;background:none;padding:0;
-    font-size:8.5pt;color:#000;-webkit-appearance:none;appearance:none;
+  /* 代餐橫幅：紙本上壓扁成一排，輸入框要拆掉表單外觀 */
+  .mstrip{grid-template-columns:repeat(4,1fr);gap:2mm;margin-top:2mm}
+  .ms-card,.ms-card.late{background:none;border:.6pt solid #999;border-radius:1.5mm;padding:1.5mm 1mm;break-inside:avoid}
+  .ms-icon{max-width:10mm;padding:.6mm;border:0;background:none}
+  .ms-meal{margin-top:1mm;font-size:7.5pt;color:#000}
+  .ms-name{margin-top:.3mm;font-size:8.5pt}
+  .ms-g{margin-top:.3mm;font-size:6.8pt}
+  .ms-card input[type="time"]{
+    width:100%;margin-top:1mm;border:0;background:none;padding:0;color:#000;
+    font-size:9.5pt;font-weight:700;text-align:center;-webkit-appearance:none;appearance:none;
   }
-  .meal input[type="time"]::-webkit-calendar-picker-indicator{display:none}
-  .meal-n{font-size:8.5pt;min-width:0;line-height:1.35}
-  .meal-n b{display:inline;font-size:8.5pt;color:#000;margin-right:.5em}
-  .kcal{display:none}
-
+  .ms-card input[type="time"]::-webkit-calendar-picker-indicator{display:none}
+  .ms-late{font-size:7pt;margin-top:.5mm;color:#000}
   .tbl-wrap{border:.6pt solid #999;overflow:visible}
   table{min-width:0;font-size:8.5pt}
   th,td{padding:1.2mm 2mm;line-height:1.35}
@@ -915,10 +925,10 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   }
 
   var MEALS = [
-    { k:"b", name:"活力雞蓉粥", meal:"早餐", g:"260g", kcal:"178 Kcal" },
-    { k:"l", name:"元氣豚骨粥", meal:"午餐", g:"260g", kcal:"160 Kcal" },
-    { k:"s", name:"手工餅乾", meal:"下午點心", g:"19g", kcal:"100 Kcal" },
-    { k:"d", name:"馬鈴薯濃湯", meal:"晚餐", g:"260g", kcal:"97 Kcal" }
+    { k:"b", i:"congeeChicken", name:"活力雞蓉粥", meal:"早餐",     g:"260g", kcal:"178 Kcal" },
+    { k:"l", i:"congeePork",    name:"元氣豚骨粥", meal:"午餐",     g:"260g", kcal:"160 Kcal" },
+    { k:"s", i:"cookie",        name:"手工餅乾",   meal:"下午點心", g:"19g",  kcal:"100 Kcal" },
+    { k:"d", i:"chowder",       name:"馬鈴薯濃湯", meal:"晚餐",     g:"260g", kcal:"97 Kcal" }
   ];
 
   /* ---------- 食物圖示 ----------
@@ -1075,7 +1085,9 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         '<li>溶解後<b>立即喝完</b>所有藥液。</li>' +
         '</ol></div>' + warnHTML();
     }
+    /* 第一劑把軟便藥收進同一串步驟，病人從頭做到尾不用跨兩段 */
     return '<div class="brew"><ol>' +
+      '<li>先吞服<b>黃色軟便藥（Dulcolax）2 顆</b>。</li>' +
       '<li>在杯中加入<b>常溫冷水約 150 c.c.</b></li>' +
       '<li>倒入<b>一包</b>保可淨散劑。</li>' +
       '<li>攪拌約 <b>3～5 分鐘</b>至完全溶解，溶解過程水溫會略為上升，屬正常現象。</li>' +
@@ -1101,19 +1113,22 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     return h;
   }
 
+  /* 四餐排成一條橫幅，每格一張圖加一個可改的時間 */
   function mealsHTML(){
-    var h = '<div class="meals">';
+    var h = '<div class="mstrip">';
     MEALS.forEach(function(m){
       var t = state.mealTimes[m.k];
       var late = t > "16:00";
-      h += '<div class="meal' + (late ? " late" : "") + '">' +
+      h += '<div class="ms-card' + (late ? " late" : "") + '">' +
+        '<div class="ms-icon">' + ICONS[m.i] + '</div>' +
+        '<div class="ms-meal">' + m.meal + '</div>' +
+        '<div class="ms-name">' + m.name + '</div>' +
+        '<div class="ms-g">' + m.g + '　' + m.kcal + '</div>' +
         '<input type="time" step="300" id="meal-' + m.k + '" data-meal="' + m.k + '" value="' + t + '" aria-label="' + m.meal + '時間">' +
-        '<span class="meal-n"><b>' + m.meal + (late ? "　超過 16:00" : "") + '</b>' + m.name + '　' + m.g + '</span>' +
-        '<span class="kcal">' + m.kcal + '</span>' +
+        (late ? '<div class="ms-late">超過 16:00</div>' : '') +
       '</div>';
     });
-    h += '</div>';
-    return h;
+    return h + '</div>';
   }
 
   /* ---------- 時程 ---------- */
@@ -1147,7 +1162,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         item("", "全天", "", "改吃易暢淨低渣代餐（四餐）",
           "<p>依盒內指示，每餐擇一加熱：<strong>微波 2 分鐘</strong>，或連鋁箔袋放入沸水<strong>隔水加熱 5 分鐘</strong>後倒出。下午點心可搭配無渣飲料。</p>" +
           "<p><strong>四餐都必須在 16:00 前吃完</strong>，時間可依自己的作息調整。</p>" +
-          foodText(EZ_MEALS) + mealsHTML())
+          mealsHTML())
       ];
       P.push({ label:"檢查前一天", date: fmtDate(dayOf(exam, -1)), items: mi.concat(eveningItems()) });
     } else {
@@ -1190,7 +1205,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   function eveningItems(){
     return [
       item("med", "17:00", "傍晚", "黃色軟便藥 2 顆，接著保可淨第一劑",
-        "<p>傍晚 5 點先吞服<strong>黃色軟便藥（Dulcolax）2 顆</strong>，吃完後<strong>可以馬上沖泡保可淨</strong>，不需要等待。</p>" +
+        "<p>軟便藥吃完後<strong>可以馬上沖泡保可淨</strong>，不需要等待。</p>" +
         brewHTML(true)),
       item("water", "18:00", "–22:00", "補水 1250～2000 c.c.",
         "<p>服藥 <strong>1 小時後</strong>開始陸續補水，約<strong>半小時一杯</strong>（250 c.c.），在 3～4 小時內完成。以白開水為主，可搭配運動飲料及清湯（菜湯、魚湯、肉湯）。</p>" +
