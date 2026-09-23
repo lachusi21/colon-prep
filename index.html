@@ -485,6 +485,8 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .print-btn{color:#0C1A1B}}
 .print-note{margin-top:12px;font-size:14px;color:var(--ink-3);line-height:1.7}
 .print-note.warn{color:var(--danger);font-weight:500}
+.print-note b{color:var(--ink)}
+.print-note .btn{margin-left:10px;vertical-align:middle}
 
 @media print{
   @page{size:A4 portrait;margin:11mm}
@@ -1476,6 +1478,27 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
       : "";
   }
 
+  /* Line、Facebook 等 App 內建的瀏覽器沒有列印功能，window.print() 按了不會有反應。
+     這種情況直接給操作步驟，不要讓病人一直按。 */
+  var UA = navigator.userAgent || "";
+  var inApp = /\bLine\//i.test(UA) || /FBAN|FBAV|FB_IAB|Instagram/i.test(UA);
+
+  function showOpenInBrowser(){
+    var ios = /iPhone|iPad|iPod/i.test(UA);
+    printNote.className = "print-note warn";
+    printNote.innerHTML =
+      "你現在是用 <b>Line 內建的瀏覽器</b>開啟，它沒有列印功能。<br>" +
+      "請點右上角的 <b>⋯</b>，選「<b>" + (ios ? "用 Safari 開啟" : "用其他瀏覽器開啟") +
+      "</b>」，再按一次這個按鈕就可以列印或存成 PDF。" +
+      "<button type=\"button\" class=\"btn\" id=\"printAnyway\">仍要試試看</button>";
+    var anyway = document.getElementById("printAnyway");
+    if (anyway) anyway.addEventListener("click", doPrint);
+  }
+
+  function doPrint(){
+    try { window.print(); } catch (e) {}
+  }
+
   printBtn.addEventListener("click", function(){
     if (!examDateObj()) {
       printNote.textContent = "請先在上面填入檢查日期，印出來的時程才會有日期。";
@@ -1484,10 +1507,17 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
       el.date.focus();
       return;
     }
+    if (inApp || typeof window.print !== "function") { showOpenInBrowser(); return; }
     printNote.textContent = NOTE_DEFAULT;
     printNote.className = "print-note";
-    window.print();
+    doPrint();
   });
+
+  /* 一進來就是 App 內建瀏覽器的話，先把話講在前面 */
+  if (inApp) {
+    printNote.innerHTML = NOTE_DEFAULT +
+      "<br><b>用 Line 開啟的話要先切換瀏覽器</b>：點右上角 <b>⋯</b> →「用其他瀏覽器開啟」。";
+  }
 
   /* 時程表裡的連結：跳過去時順便把摺疊的超商清單展開 */
   document.addEventListener("click", function(e){
