@@ -51,7 +51,7 @@
   --serif:"Noto Serif TC","Songti TC",serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
-@media (prefers-color-scheme:dark){
+@media screen and (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --ground:#0C1A1B;
     --surface:#142426;
@@ -145,7 +145,7 @@ a{color:var(--accent);text-underline-offset:3px}
 }
 .m-a{background-image:url("mascot-a.png")}
 .m-b{background-image:url("mascot-b.png")}
-@media (max-width:660px){
+@media screen and (max-width:660px){
   .mast-row{flex-direction:column;align-items:stretch;gap:16px}
   .mascots{justify-content:flex-end}
   .mascot{--h:100px}
@@ -289,7 +289,7 @@ input[type="date"],input[type="time"]{
 }
 .cup[aria-pressed="true"]{background:var(--water);color:var(--surface)}
 :root[data-theme="dark"] .cup[aria-pressed="true"]{color:#0E1517}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cup[aria-pressed="true"]{color:#0E1517}}
+@media screen and (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cup[aria-pressed="true"]{color:#0E1517}}
 .cup.opt{border-style:dashed}
 .hy-hint{margin-top:11px;font-size:15px;color:var(--ink-2);line-height:1.75}
 .hy-hint b{color:var(--ink)}
@@ -451,7 +451,7 @@ td b{color:var(--danger)}
   padding:9px 18px;border-radius:9px;
 }
 :root[data-theme="dark"] .line-btn{color:#0C1A1B}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .line-btn{color:#0C1A1B}}
+@media screen and (prefers-color-scheme:dark){:root:not([data-theme="light"]) .line-btn{color:#0C1A1B}}
 
 .phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:13px;margin-top:14px}
 .phone{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px 17px}
@@ -482,7 +482,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 }
 .print-btn:hover{background:var(--accent-2)}
 :root[data-theme="dark"] .print-btn{color:#0C1A1B}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .print-btn{color:#0C1A1B}}
+@media screen and (prefers-color-scheme:dark){:root:not([data-theme="light"]) .print-btn{color:#0C1A1B}}
 .print-note{margin-top:12px;font-size:14px;color:var(--ink-3);line-height:1.7}
 .print-note.warn{color:var(--danger);font-weight:500}
 .print-note b{color:var(--ink)}
@@ -541,6 +541,11 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   .phase-head h3{order:2}
   .tl{padding-top:1.5mm}
   .tl-item{grid-template-columns:21mm 4mm 1fr;break-inside:avoid}
+  /* 補水那一格最高（說明＋八個杯子），不准它跨頁的話第一頁會空掉一大塊。
+     讓它可以斷，但杯子那一盒與標題不切開。 */
+  .tl-item.k-water{break-inside:auto}
+  .hydrate{break-inside:avoid}
+  .card h4{break-after:avoid}
   .tl-when{font-size:12pt;padding-top:0}
   .tl-when small{font-size:9pt}
   /* 圓點依步驟種類自己上色：喝藥青、補水藍、禁食紅 */
@@ -655,7 +660,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   details[open] summary::after,summary::after{display:none}
 }
 
-@media (max-width:430px){
+@media screen and (max-width:430px){
   .tl-item{grid-template-columns:4.6rem 1.3rem 1fr}
   .tl-when{font-size:15.5px}
   .tl-body{padding-left:10px}
