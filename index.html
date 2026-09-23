@@ -307,9 +307,20 @@ input[type="date"],input[type="time"]{
 .meal.late .meal-n b{color:var(--danger)}
 
 /* ── 飲食說明（單一區塊，用小標分段） ── */
+.fboxes{display:flex;flex-direction:column;gap:20px}
 .fbox{
-  border-radius:12px;padding:18px 20px;background:var(--surface);
-  border:1px solid var(--line);box-shadow:var(--shadow);
+  border-radius:14px;padding:18px 20px;background:var(--surface);
+  border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;
+}
+.fbox-head{
+  margin:-18px -20px 18px;padding:15px 20px;background:var(--brand);color:#fff;
+  font-family:var(--serif);font-weight:700;line-height:1.4;
+  font-size:clamp(19px,4.4vw,23px);
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+}
+.fh-day{
+  font-family:var(--mono);font-weight:700;color:#FFD97A;letter-spacing:.02em;
+  font-size:clamp(16px,3.6vw,19px);
 }
 /* 食物圖示 */
 .fgrid{
@@ -1036,23 +1047,34 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
       el.dietTitle.textContent = "易暢淨低渣代餐";
       el.dietSub.innerHTML = "檢查前二天照常吃，<b>只有檢查前一天</b>改吃代餐四餐，並在 16:00 前全部吃完。";
       el.dietBody.innerHTML =
-        '<div class="fbox">' +
-          '<p class="fsub">前二天</p>' +
-          '<p class="foodline">一般正常飲食，不需特別限制。</p>' +
-          '<p class="fsub">前一天　易暢淨四餐</p>' + foodGrid(EZ_MEALS) +
-          '<p class="fsub">加熱方式（擇一）</p>' +
-          '<p class="foodline">撕開鋁箔，倒出內容物於容器中<strong>微波加熱 2 分鐘</strong>；或將鋁箔袋放入沸騰開水<strong>隔水加熱 5 分鐘</strong>後再撕開倒出。下午點心的手工餅乾可搭配無渣飲料。四餐粗纖維總重量僅 0.095g。</p>' +
-          '<p class="fsub">喝的東西　無渣流質</p>' + fluidNote + foodGrid(CLEAR_FLUIDS) +
+        '<div class="fboxes">' +
+          '<div class="fbox">' +
+            '<div class="fbox-head"><span class="fh-day">檢查前一天</span>易暢淨代餐四餐</div>' +
+            '<p class="foodline">檢查前二天<strong>一般正常飲食</strong>，不需特別限制。只有前一天改吃代餐，四餐都要在 <strong>16:00 前吃完</strong>。</p>' +
+            foodGrid(EZ_MEALS) +
+            '<p class="fsub">加熱方式（擇一）</p>' +
+            '<p class="foodline">撕開鋁箔，倒出內容物於容器中<strong>微波加熱 2 分鐘</strong>；或將鋁箔袋放入沸騰開水<strong>隔水加熱 5 分鐘</strong>後再撕開倒出。下午點心的手工餅乾可搭配無渣飲料。四餐粗纖維總重量僅 0.095g。</p>' +
+          '</div>' +
+          '<div class="fbox">' +
+            '<div class="fbox-head"><span class="fh-day">檢查前一天起</span>只能喝無渣流質</div>' +
+            fluidNote + foodGrid(CLEAR_FLUIDS) +
+          '</div>' +
         '</div>';
     } else {
       el.dietTitle.textContent = "自主飲食控制";
       el.dietSub.innerHTML = "檢查前<b>二天</b>開始低渣飲食，檢查前<b>一天</b>只喝無渣流質。";
       el.dietBody.innerHTML =
-        '<div class="fbox">' +
-          '<p class="fsub">前二天　只可以吃</p>' + foodGrid(LOW_RESIDUE) +
-          '<p class="fsub stop">前二天　一律停掉</p>' +
-          '<p class="foodline">' + STOP_LIST + '</p>' +
-          '<p class="fsub">前一天　只能喝無渣流質</p>' + fluidNote + foodGrid(CLEAR_FLUIDS) +
+        '<div class="fboxes">' +
+          '<div class="fbox">' +
+            '<div class="fbox-head"><span class="fh-day">檢查前二天</span>低渣飲食</div>' +
+            '<p class="fsub">只可以吃</p>' + foodGrid(LOW_RESIDUE) +
+            '<p class="fsub stop">一律停掉</p>' +
+            '<p class="foodline">' + STOP_LIST + '</p>' +
+          '</div>' +
+          '<div class="fbox">' +
+            '<div class="fbox-head"><span class="fh-day">檢查前一天</span>只能喝無渣流質</div>' +
+            fluidNote + foodGrid(CLEAR_FLUIDS) +
+          '</div>' +
         '</div>';
     }
   }
