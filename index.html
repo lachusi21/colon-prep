@@ -472,75 +472,118 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 .print-note{margin-top:12px;font-size:14px;color:var(--ink-3);line-height:1.7}
 .print-note.warn{color:var(--danger);font-weight:500}
 
-.print-sheet{display:none}
-
 @media print{
-  @page{size:A4 portrait;margin:9mm}
+  @page{size:A4 portrait;margin:11mm}
 
-  /* 手機開深色模式直接列印會變成淺字，強制白底黑字 */
-  :root,:root[data-theme="dark"]{--ink:#000;--ink-2:#000;--line:#000}
-
-  .wrap > header,.wrap > section,.wrap > footer{display:none!important}
+  /* 深色模式下列印會整片黑，強制回到白底黑字 */
+  :root,:root[data-theme="dark"]{
+    --ground:#fff;--surface:#fff;--surface-2:#fff;
+    --ink:#000;--ink-2:#1a1a1a;--ink-3:#444;
+    --line:#b0b0b0;--line-strong:#777;--rail:#999;
+    --accent:#000;--accent-2:#000;--brand:#000;--water:#000;
+    --accent-wash:#fff;--water-wash:#fff;--go-wash:#fff;--amber-wash:#fff;
+    --shadow:none;
+  }
   html,body{background:#fff}
-  body{
-    font-size:8.6pt;line-height:1.42;color:#000;font-family:var(--sans);
-    -webkit-print-color-adjust:exact;print-color-adjust:exact;
-  }
+  body{font-size:9.5pt;line-height:1.48;color:#000}
   .wrap{max-width:100%;padding:0}
-  .print-sheet{display:block}
 
-  .ps-head{text-align:center;margin-bottom:2.5mm}
-  .ps-clinic{font-family:var(--serif);font-weight:700;font-size:16pt;letter-spacing:.04em}
-  .ps-sub{font-size:9pt;margin-top:.8mm;letter-spacing:.08em}
-  .ps-meta{
-    margin-top:2mm;font-size:9.5pt;border:.8pt solid #000;border-radius:1.5mm;
-    padding:1.5mm 3mm;display:inline-block;background:#FFFCE8;
-  }
+  /* 螢幕上才有意義的、或已在時程表中重複的內容都不印 */
+  .masthead,.setup,.sec-diet,.sec-faq,.sec-print,.sec-target,.sec-post,
+  .eyebrow,.sec-sub,.store,.btn,.line-btn{display:none!important}
 
-  .ps-table{width:100%;border-collapse:collapse;table-layout:fixed}
-  .ps-table th,.ps-table td{border:.8pt solid #000;padding:1.6mm 2mm;vertical-align:top;text-align:left}
-  .ps-stage{
-    width:19mm;text-align:center;vertical-align:middle;font-weight:700;font-size:10pt;
-    background:#EAF2F2;line-height:1.35;
-  }
-  .ps-stage small{display:block;font-weight:400;font-size:7.5pt;margin-top:.8mm}
-  .ps-time{
-    width:21mm;font-family:var(--mono);font-weight:700;font-size:10pt;
-    text-align:center;vertical-align:middle;line-height:1.3;
-  }
-  .ps-time small{display:block;font-size:7.5pt;font-weight:400;margin-top:.4mm}
-  .ps-what{
-    width:19mm;text-align:center;vertical-align:middle;font-weight:700;font-size:10pt;
-    background:#F4F8F8;line-height:1.35;
-  }
-  .ps-detail{font-size:8.6pt;line-height:1.5}
-  .ps-table td b,.ps-table th b{color:#000;font-weight:700}
-  .ps-detail b{font-weight:700}
-  .ps-no{color:#B3261E}
-  .ps-hl{background:#FFF08A;padding:0 .6mm;font-weight:700}
+  .print-head{display:block;border-bottom:1.5pt solid #000;padding-bottom:1.8mm;margin-bottom:3.5mm}
+  .ph-clinic{font-family:var(--serif);font-weight:700;font-size:13pt}
+  .ph-meta{margin-top:1mm;font-size:9.5pt;font-family:var(--mono)}
 
-  .ps-warn{
-    display:inline-block;border:1.4pt solid #B3261E;color:#B3261E;font-weight:700;
-    font-size:11pt;padding:.6mm 2.5mm;letter-spacing:.04em;vertical-align:middle;
+  section{padding-block:0;border:0;margin-bottom:5mm;break-inside:auto}
+  h2{font-size:11pt;margin-bottom:1.8mm;border-bottom:.8pt solid #000;padding-bottom:1mm}
+  .sec-head{margin-bottom:2mm}
+  section:first-of-type h2{display:none}
+  section:first-of-type .sec-head{display:none}
+
+  /* 時程表：拿掉卡片外框，只留左側時間軸，密度最高 */
+  .phase{margin-top:4.5mm;break-inside:auto}
+  .phase-head{background:none;border-radius:0;border-bottom:1pt solid #000;padding:0 0 1mm;gap:6px;break-after:avoid;break-inside:avoid}
+  .phase-head h3{color:#000;font-size:11.5pt}
+  .phase-date,.fh-day{color:#000;font-size:10.5pt}
+  .tl{padding-top:1.5mm}
+  .tl-item{grid-template-columns:16mm 3.5mm 1fr;break-inside:avoid}
+  .tl-when{font-size:9.5pt;padding-top:0}
+  .tl-when small{font-size:7pt}
+  .tl-dot{width:1.8mm;height:1.8mm;top:2mm;background:#000;border-color:#000;border-width:0}
+  .tl-rail::before{width:.5pt}
+  .tl-item:first-child .tl-rail::before{top:2mm;height:calc(100% - 2mm)}
+  .tl-item:last-child .tl-rail::before{height:2mm}
+  .tl-body{padding:0 0 3.2mm 3mm}
+  .card,.card.hi{border:0;box-shadow:none;padding:0;background:none}
+  .card h4{font-size:10.5pt;line-height:1.4}
+  .card p,.card ul,.brew ol,.foodline{font-size:9pt;line-height:1.5;margin-top:1.2mm}
+  .card ul{padding-left:4mm}
+  .card li{margin-top:.8mm}
+
+  .brew{background:none;border-left:1pt solid #000;border-radius:0;padding:.3mm 0 .3mm 2.5mm;margin-top:1mm}
+  .brew ol{padding-left:4mm}
+  .brew li{margin-top:.8mm}
+  .warn-strip{background:none;border:.9pt solid #000;border-radius:0;padding:1mm 2mm;margin-top:1mm;gap:2mm}
+  .warn-strip .big{font-size:9.5pt;color:#000}
+  .warn-strip span{font-size:8pt;line-height:1.3}
+  .stop-line strong{background:none;border:.7pt solid #000;color:#000;font-size:8pt;padding:0 1.5mm}
+
+  /* 補水杯一律印成空格，讓病人喝完一杯自己打勾 */
+  .hydrate{background:none;border:0;border-radius:0;padding:0;margin-top:1mm}
+  .hy-top b,.hy-total{color:#000;font-size:8.5pt}
+  .cups{gap:1.2mm;margin-top:1mm}
+  .cup,.cup[aria-pressed="true"]{
+    width:6.5mm;height:7.5mm;background:#fff;color:#000;border-color:#000;border-width:.7pt;font-size:5.5pt;
   }
-  .ps-warn-sub{font-size:7.5pt;color:#B3261E;margin-left:2mm;vertical-align:middle}
-  .ps-steps{margin-top:1.2mm}
+  .hy-hint{font-size:8pt;margin-top:1mm;line-height:1.3}
 
-  .ps-cups{display:flex;align-items:flex-end;gap:1mm;margin-top:1.5mm;flex-wrap:nowrap}
-  .ps-cup-label{font-size:7.5pt;margin-right:.5mm;align-self:center}
-  .ps-cups i{
-    display:flex;align-items:flex-end;justify-content:center;
-    width:5.6mm;height:6.8mm;border:.8pt solid #000;
-    border-radius:.5mm .5mm 1.8mm 1.8mm;
-    font-family:var(--mono);font-size:7pt;font-style:normal;padding-bottom:.6mm;
+  /* 代餐時間是輸入框，列印時要拆掉表單外觀才不會佔一大格 */
+  .meals{margin-top:1.5mm;gap:.6mm}
+  .meal,.meal.late{background:none;padding:0;gap:2mm;flex-wrap:nowrap}
+  .meal input[type="time"]{
+    width:auto;min-width:0;flex:0 0 auto;border:0;background:none;padding:0;
+    font-size:8.5pt;color:#000;-webkit-appearance:none;appearance:none;
   }
+  .meal input[type="time"]::-webkit-calendar-picker-indicator{display:none}
+  .meal-n{font-size:8.5pt;min-width:0;line-height:1.35}
+  .meal-n b{display:inline;font-size:8.5pt;color:#000;margin-right:.5em}
+  .kcal{display:none}
 
-  .ps-foot{margin-top:2mm;border:.8pt solid #000;padding:1.8mm 2.5mm}
-  .ps-foot p{font-size:7.8pt;line-height:1.45;margin-top:1mm}
-  .ps-foot p:first-child{margin-top:0}
-  .ps-fine{margin-left:3mm;color:#444}
+  .tbl-wrap{border:.6pt solid #999;overflow:visible}
+  table{min-width:0;font-size:8.5pt}
+  th,td{padding:1.2mm 2mm;line-height:1.35}
+  th{background:none;border-bottom:.9pt solid #000;color:#000;font-size:7.5pt}
+  td b{color:#000;text-decoration:underline}
 
-  .ps-table tr{break-inside:avoid}
+  .fboxes{gap:2.5mm}
+  .fbox{border:.6pt solid #999;box-shadow:none;padding:2mm 3mm;break-inside:avoid}
+  .fbox-head{background:none;color:#000;border-bottom:.9pt solid #000;border-radius:0;margin:-2mm -3mm 2mm;padding:1.2mm 3mm;font-size:10pt}
+  .fbox ul{font-size:8.5pt;padding-left:4mm;margin-top:1.5mm;line-height:1.4}
+  .fbox li{margin-top:.6mm}
+
+  .alert{background:none;border:.9pt solid #000;border-radius:0;padding:2mm 3mm;margin-top:2.5mm;break-inside:avoid}
+  .alert h3{color:#000;font-size:9.5pt}
+  .alert ul{font-size:8.5pt;padding-left:4mm;margin-top:1.2mm;line-height:1.4}
+  .alert li{margin-top:.4mm}
+  .alert .foot{font-size:8pt;margin-top:1.2mm}
+
+  .line-card{border:.6pt solid #999;box-shadow:none;padding:2mm 3mm;break-inside:avoid;gap:3mm}
+  .qr{width:21mm;height:21mm;padding:0}
+  .qr img,.qr canvas{width:21mm;height:21mm}
+  .line-id{font-size:12pt;margin-top:0}
+  .line-info .who{font-size:7.5pt}
+  .line-info p{font-size:8pt;margin-top:.8mm;line-height:1.35}
+  .phones{gap:2.5mm;margin-top:2.5mm}
+  .phone{border:.6pt solid #999;padding:2mm 3mm;break-inside:avoid}
+  .phone .who{font-size:7.5pt}
+  .phone .num{font-size:12pt;color:#000;margin-top:.5mm}
+  .phone .when{font-size:7.5pt;margin-top:.5mm;line-height:1.35}
+
+  a{color:#000;text-decoration:none}
+  footer{border-top:.7pt solid #000;padding-block:2mm 0;font-size:7pt;color:#333;line-height:1.4}
+  details[open] summary::after,summary::after{display:none}
 }
 
 @media (max-width:430px){
@@ -562,8 +605,11 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 
 <div class="wrap">
 
-  <!-- 只在列印時出現：壓成 A4 一頁的表格版 -->
-  <div class="print-sheet" id="printSheet"></div>
+  <!-- 只在列印時出現的抬頭 -->
+  <div class="print-head">
+    <div class="ph-clinic">周中凱腸胃內科診所　清腸衛教指引</div>
+    <div class="ph-meta" id="phMeta"></div>
+  </div>
 
   <header class="masthead">
     <div class="mast-row">
@@ -1302,87 +1348,11 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   var phMeta = document.getElementById("phMeta");
   var NOTE_DEFAULT = printNote.textContent;
 
-  /* 列印頁：仿診所原本那張表的格線分區，壓在 A4 一頁內。
-     日期取自畫面上同一份資料，所以兩邊不會對不起來。 */
-
-  function cupRow(n, label){
-    var h = '<div class="ps-cups"><span class="ps-cup-label">' + label + '</span>';
-    for (var i = 1; i <= n; i++) h += '<i>' + i + '</i>';
-    return h + '</div>';
-  }
-  function hl(t){ return '<span class="ps-hl">' + t + '</span>'; }
-  function warnBox(){ return '<span class="ps-warn">不可直接吞服粉末</span><span class="ps-warn-sub">以防食道灼傷</span>'; }
-
-  function row(stage, span, time, sub, what, detail){
-    return '<tr>' +
-      (stage ? '<th class="ps-stage" rowspan="' + span + '">' + stage + '</th>' : '') +
-      '<td class="ps-time">' + time + (sub ? '<small>' + sub + '</small>' : '') + '</td>' +
-      '<td class="ps-what">' + what + '</td>' +
-      '<td class="ps-detail">' + detail + '</td>' +
-    '</tr>';
-  }
-
   function updatePrintHead(){
     var exam = examDateObj();
-    if (!exam) { printSheet.innerHTML = ""; return; }
-
-    var d7 = fmtDate(dayOf(exam, -7)), d2 = fmtDate(dayOf(exam, -2)), d1 = fmtDate(dayOf(exam, -1));
-    var rows = "";
-
-    rows += row("檢查<br>前一週", 1, d7, "起", "保水",
-      "每天補足 " + hl("1500～2000 c.c.") + " 水分。體內水分不足會直接影響清腸效果。");
-
-    if (state.useMeal) {
-      rows += row("檢查<br>前一～二天", 1, d1, "", "低渣代餐",
-        "前二天<b>一般正常飲食</b>，不需限制。前一天改吃<b>易暢淨四餐</b>——活力雞蓉粥、元氣豚骨粥、手工餅乾、馬鈴薯濃湯，" +
-        "微波 2 分鐘或隔水加熱 5 分鐘，" + hl("四餐都要在 16:00 前吃完") + "。");
-    } else {
-      rows += row("檢查<br>前一～二天", 2, d2, "全天", "低渣飲食",
-        "<b>只可以吃</b>　白稀飯、白吐司、白饅頭、白麵條、海綿蛋糕、去皮魚肉、蒸蛋、蛋花湯<br>" +
-        "<b class=\"ps-no\">一律停掉</b>　" + STOP_LIST);
-      rows += row("", 0, d1, "全天", "無渣流質",
-        "<b>不再吃任何固體食物。</b>只喝水、運動飲料、紅茶、綠茶、冬瓜茶、蘆筍汁、甘蔗汁、椰子水、蜂蜜水、" +
-        "澄清菜湯／肉湯／魚湯（" + hl("料不能吃") + "）。");
-    }
-
-    rows += row("第一劑<br><small>" + d1 + "</small>", 5, "傍晚 17:00", "", "服藥",
-      warnBox() +
-      "<div class=\"ps-steps\">先吞<b>黃色軟便藥 2 顆</b>，吃完可以馬上泡保可淨：常溫冷水 " + hl("150 c.c.") +
-      " 加一包，攪拌 3～5 分鐘<b>完全溶解</b>後" + hl("立即喝完") + "。</div>");
-    rows += row("", 0, "18:00", "～22:00", "補水",
-      "服藥 1 小時後開始，" + hl("1250～2000 c.c.") + "，約半小時一杯，3～4 小時內完成。喝完一杯打一個勾。" +
-      cupRow(8, "250 c.c. ×"));
-    rows += row("", 0, "約 20:00", "", "排便",
-      "服藥後約 3 小時開始排便。請<b>多走動、按摩腹部</b>幫助排便，期間會跑好幾趟廁所。");
-    rows += row("", 0, "20:00", "", "Line",
-      "診所會用 Line 詢問你的<b>解便次數</b>與<b>補水杯數</b>，請記得回覆。");
-    rows += row("", 0, "21:00", "", "未排便",
-      "晚上 9 點仍未排便或嚴重不適 → Line <b>@420genld</b> 或 <b>0800-060-689</b>。");
-
-    rows += row("第二劑<br><small>" + fmtDate(exam) + "</small>", 3, "早上 05:00", "", "服藥",
-      warnBox() + "<div class=\"ps-steps\">泡製方式<b>與第一劑完全相同</b>。這一劑是清腸品質的關鍵，<b>不能省略</b>。</div>");
-    rows += row("", 0, "05:30", "起", "補水",
-      "服藥 30 分鐘後補水 " + hl("750 c.c.") + "。排出" + hl("淡黃清澈的水") + "就是清腸成功。" +
-      cupRow(3, "250 c.c. ×"));
-    rows += row("", 0, "06:00", "起", "禁水",
-      "<b>禁止進食、喝水</b>，連水都不要喝。這是麻醉安全的規定。");
-
-    rows += row("檢查", 1, "上午", "依約定時間", "大腸鏡",
-      "帶健保卡與身分證，依診所給的時間報到。" + hl("自費麻醉須家屬陪同") + "，當天不可自行開車或騎車。");
-
-    printSheet.innerHTML =
-      '<div class="ps-head">' +
-        '<div class="ps-clinic">大腸鏡檢前　飲食及保可淨服用說明</div>' +
-        '<div class="ps-sub">周中凱腸胃內科診所</div>' +
-        '<div class="ps-meta">排檢時間　<b>' + fmtDate(exam) + '　上午</b>　｜　飲食方式　<b>' +
-          (state.useMeal ? '選用低渣專用代餐' : '自主飲食控制') + '</b></div>' +
-      '</div>' +
-      '<table class="ps-table"><tbody>' + rows + '</tbody></table>' +
-      '<div class="ps-foot">' +
-        '<p><b>用藥</b>　口服 GLP-1 與瘦瘦針停藥一週｜緩解便秘藥物請勿停藥｜降血糖藥與抗凝血劑依醫師指示｜其他藥品於服用清腸劑前 2 小時或清腸後 6 小時服用</p>' +
-        '<p><b>有問題</b>　診所 Line <b>@420genld</b>　｜　24 小時免付費諮詢專線 <b>0800-060-689</b>' +
-        '<span class="ps-fine">以上為一般做法，若醫師另有指示，仍以醫師指示為準。</span></p>' +
-      '</div>';
+    phMeta.textContent = exam
+      ? "檢查日期：" + fmtDate(exam) + " 上午　·　飲食方式：" + (state.useMeal ? "易暢淨低渣代餐" : "自主飲食控制")
+      : "檢查日期：＿＿＿＿＿＿　·　飲食方式：" + (state.useMeal ? "易暢淨低渣代餐" : "自主飲食控制");
   }
 
   printBtn.addEventListener("click", function(){
