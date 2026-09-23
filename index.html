@@ -459,6 +459,110 @@ details p{padding:0 0 16px;font-size:14.5px;color:var(--ink-2);max-width:40em}
 
 footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;border-top:1px solid var(--line)}
 
+/* ── 列印 ── */
+.print-head{display:none}
+.print-btn{
+  font-family:var(--sans);font-size:17px;font-weight:700;cursor:pointer;
+  background:var(--brand);color:#fff;border:0;border-radius:11px;
+  padding:15px 28px;box-shadow:var(--shadow);
+}
+.print-btn:hover{background:var(--accent-2)}
+:root[data-theme="dark"] .print-btn{color:#0C1A1B}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .print-btn{color:#0C1A1B}}
+.print-note{margin-top:12px;font-size:14px;color:var(--ink-3);line-height:1.7}
+.print-note.warn{color:var(--danger);font-weight:500}
+
+@media print{
+  @page{size:A4 portrait;margin:12mm}
+
+  /* 深色模式下列印會整片黑，強制回到白底黑字 */
+  :root,:root[data-theme="dark"]{
+    --ground:#fff;--surface:#fff;--surface-2:#fff;
+    --ink:#000;--ink-2:#1a1a1a;--ink-3:#555;
+    --line:#b0b0b0;--line-strong:#777;--rail:#aaa;
+    --accent:#000;--accent-2:#000;--brand:#000;--water:#000;
+    --accent-wash:#fff;--water-wash:#fff;--go-wash:#fff;--amber-wash:#fff;
+    --shadow:none;
+  }
+  html,body{background:#fff}
+  body{font-size:10.5pt;line-height:1.55;color:#000}
+  .wrap{max-width:100%;padding:0}
+
+  /* 螢幕上才有意義的東西不印 */
+  .masthead,.setup,.sec-diet,.sec-faq,.sec-print,
+  .eyebrow,.sec-sub,.store,.btn{display:none!important}
+
+  .print-head{display:block;border-bottom:2pt solid #000;padding-bottom:3mm;margin-bottom:6mm}
+  .ph-clinic{font-family:var(--serif);font-weight:700;font-size:15pt}
+  .ph-meta{margin-top:2mm;font-size:11pt;font-family:var(--mono)}
+
+  section{padding-block:0;border:0;margin-bottom:7mm;break-inside:auto}
+  h2{font-size:13pt;margin-bottom:3mm;border-bottom:.8pt solid #000;padding-bottom:1.5mm}
+  .sec-head{margin-bottom:4mm}
+  /* 第一個區塊的標題是「先選飲食方式…」，紙本上沒有意義 */
+  section:first-of-type h2{display:none}
+  section:first-of-type .sec-head{margin-bottom:0}
+
+  .phase{margin-top:5mm;break-inside:avoid}
+  .phase-head{background:none;border-radius:0;border-bottom:1.2pt solid #000;padding:0 0 1.5mm}
+  .phase-head h3{color:#000;font-size:12pt}
+  .phase-date,.fh-day{color:#000;font-size:11pt}
+  .tl{padding-top:3mm}
+  .tl-item{grid-template-columns:19mm 5mm 1fr;break-inside:avoid}
+  .tl-when{font-size:10pt;padding-top:2mm}
+  .tl-when small{font-size:8pt}
+  .tl-dot{background:#000;border-color:#000}
+  .tl-body{padding:0 0 3mm 3mm}
+  .card{box-shadow:none;border:.6pt solid #999;padding:2.5mm 3mm}
+  .card.hi{border-width:1.2pt;border-color:#000}
+  .card h4{font-size:11pt}
+  .card p,.card ul,.brew ol,.foodline{font-size:10pt;line-height:1.5;margin-top:1.5mm}
+
+  .brew{background:none;border-left:2pt solid #000;border-radius:0;padding:1.5mm 0 1.5mm 4mm;margin-top:2mm}
+  .warn-strip{background:none;border:1.2pt solid #000;border-radius:0;padding:2mm 3mm;margin-top:2mm}
+  .warn-strip .big{font-size:11.5pt;color:#000}
+  .warn-strip span{font-size:9.5pt}
+  .stop-line strong{background:none;border:.8pt solid #000;color:#000;font-size:9.5pt}
+
+  /* 補水杯一律印成空格，讓病人喝完一杯自己打勾 */
+  .hydrate{background:none;border:.6pt dashed #888;border-radius:0;padding:2mm 3mm;margin-top:2mm}
+  .hy-top b,.hy-total{color:#000;font-size:10pt}
+  .cups{gap:2mm;margin-top:2mm}
+  .cup,.cup[aria-pressed="true"]{
+    width:9mm;height:10mm;background:#fff;color:#000;border-color:#000;font-size:7pt;
+  }
+
+  .target{border:.6pt solid #999;padding:3mm}
+  .target .swatch{width:20mm;height:20mm;border:.6pt solid #999}
+  .tbl-wrap{border:.6pt solid #999;overflow:visible}
+  table{min-width:0;font-size:9.5pt}
+  th,td{padding:2mm 3mm}
+  th{background:none;border-bottom:1pt solid #000;color:#000}
+  td b{color:#000;text-decoration:underline}
+
+  .fboxes{gap:4mm}
+  .fbox{border:.6pt solid #999;box-shadow:none;padding:3mm 4mm;break-inside:avoid}
+  .fbox-head{background:none;color:#000;border-bottom:1pt solid #000;border-radius:0;margin:-3mm -4mm 3mm;padding:2mm 4mm;font-size:11.5pt}
+  .fbox ul{font-size:10pt}
+
+  .alert{background:none;border:1.2pt solid #000;border-radius:0;padding:3mm 4mm;break-inside:avoid}
+  .alert h3{color:#000;font-size:11pt}
+  .alert ul{font-size:10pt}
+
+  .line-card{border:.6pt solid #999;box-shadow:none;padding:3mm 4mm;break-inside:avoid;gap:5mm}
+  .qr{width:28mm;height:28mm;padding:0}
+  .qr img,.qr canvas{width:28mm;height:28mm}
+  .line-id{font-size:14pt}
+  .line-btn{display:none}
+  .phones{gap:4mm;margin-top:4mm}
+  .phone{border:.6pt solid #999;padding:3mm 4mm;break-inside:avoid}
+  .phone .num{font-size:14pt;color:#000}
+
+  a{color:#000;text-decoration:none}
+  footer{border-top:.8pt solid #000;padding-block:3mm 0;font-size:8.5pt;color:#333}
+  details[open] summary::after,summary::after{display:none}
+}
+
 @media (max-width:430px){
   .tl-item{grid-template-columns:4.6rem 1.3rem 1fr}
   .tl-when{font-size:15.5px}
@@ -477,6 +581,12 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 <body>
 
 <div class="wrap">
+
+  <!-- 只在列印時出現的抬頭 -->
+  <div class="print-head">
+    <div class="ph-clinic">周中凱腸胃內科診所　清腸衛教指引</div>
+    <div class="ph-meta" id="phMeta"></div>
+  </div>
 
   <header class="masthead">
     <div class="mast-row">
@@ -533,7 +643,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   </section>
 
   <!-- 飲食細節 -->
-  <section>
+  <section class="sec-diet">
     <div class="sec-head">
       <span class="eyebrow">飲食</span>
       <h2 id="dietTitle">飲食內容</h2>
@@ -676,7 +786,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   </section>
 
   <!-- FAQ -->
-  <section>
+  <section class="sec-faq">
     <div class="sec-head">
       <span class="eyebrow">常見問題</span>
       <h2>大家都會問的</h2>
@@ -701,6 +811,17 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
       <summary>早上 6 點之後真的一滴水都不能喝嗎？</summary>
       <p>是的。這是<b>麻醉安全</b>的界線，不是清腸的要求——胃裡有液體時做鎮靜麻醉，有嗆入肺部的風險。若有非停不可的藥需要服用，請先透過 Line 確認。另外提醒，<b>自費麻醉者檢查當天須有家屬陪同</b>，且不可自行開車或騎車。</p>
     </details>
+  </section>
+
+  <!-- 列印 -->
+  <section class="sec-print">
+    <div class="sec-head">
+      <span class="eyebrow">帶回家</span>
+      <h2>印一份紙本貼在冰箱上</h2>
+      <p class="sec-sub">填好上面的檢查日期之後，按下面的按鈕會印出<b>屬於你的時程表</b>，日期都已經換算好。手機也可以按，選「存成 PDF」就能存在手機裡。</p>
+    </div>
+    <button type="button" class="print-btn" id="printBtn">列印我的清腸時程</button>
+    <p class="print-note" id="printNote">A4 直式，約 2 頁。補水的杯子會印成空格，喝完一杯自己打勾。</p>
   </section>
 
   <footer>
@@ -1100,6 +1221,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     bindMeals();
     updateTotals();
     updateCountdown(exam);
+    updatePrintHead();
   }
 
   function bindCups(){
@@ -1192,10 +1314,37 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     save();
     renderDiet();
     renderSchedule();
+    updatePrintHead();
   }
 
   el.optMeal.addEventListener("click", function(){ setMode(true); });
   el.optSelf.addEventListener("click", function(){ setMode(false); });
+  /* ---------- 列印 ---------- */
+  var printBtn = document.getElementById("printBtn");
+  var printNote = document.getElementById("printNote");
+  var phMeta = document.getElementById("phMeta");
+  var NOTE_DEFAULT = printNote.textContent;
+
+  function updatePrintHead(){
+    var exam = examDateObj();
+    phMeta.textContent = exam
+      ? "檢查日期：" + fmtDate(exam) + " 上午　·　飲食方式：" + (state.useMeal ? "易暢淨低渣代餐" : "自主飲食控制")
+      : "檢查日期：＿＿＿＿＿＿　·　飲食方式：" + (state.useMeal ? "易暢淨低渣代餐" : "自主飲食控制");
+  }
+
+  printBtn.addEventListener("click", function(){
+    if (!examDateObj()) {
+      printNote.textContent = "請先在上面填入檢查日期，印出來的時程才會有日期。";
+      printNote.className = "print-note warn";
+      el.date.scrollIntoView({ block: "center" });
+      el.date.focus();
+      return;
+    }
+    printNote.textContent = NOTE_DEFAULT;
+    printNote.className = "print-note";
+    window.print();
+  });
+
   el.date.addEventListener("change", renderSchedule);
   el.reset.addEventListener("click", function(){
     state.cups = {};
