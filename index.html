@@ -293,27 +293,21 @@ input[type="date"],input[type="time"]{
 .hy-hint{margin-top:11px;font-size:15px;color:var(--ink-2);line-height:1.75}
 .hy-hint b{color:var(--ink)}
 
-/* 代餐四餐：橫幅四格 */
-.mstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
-.ms-card{
-  background:var(--surface-2);border:1px solid var(--line);border-radius:13px;
-  padding:12px 10px 11px;text-align:center;min-width:0;
+/* 代餐（螢幕版：直式清單） */
+.meals{display:flex;flex-direction:column;gap:9px;margin-top:11px}
+.meal{
+  display:flex;align-items:center;gap:12px;background:var(--surface-2);
+  border-radius:9px;padding:9px 12px;flex-wrap:wrap;
 }
-.ms-icon{
-  width:100%;max-width:62px;aspect-ratio:1;margin:0 auto;padding:7px;
-  background:var(--surface);border:1px solid var(--line);border-radius:12px;
-}
-.ms-icon svg{width:100%;height:100%;display:block}
-.ms-meal{margin-top:9px;font-size:13px;font-weight:500;color:var(--accent);letter-spacing:.04em}
-.ms-name{margin-top:2px;font-size:16px;font-weight:700;line-height:1.35}
-.ms-g{margin-top:3px;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
-.ms-card input[type="time"]{
-  width:100%;margin-top:10px;text-align:center;font-size:16px;padding:7px 4px;
-  background:var(--surface);
-}
-.ms-late{margin-top:6px;font-size:12px;font-weight:700;color:var(--danger)}
-.ms-card.late{background:var(--danger-wash);border-color:color-mix(in srgb,var(--danger) 35%,transparent)}
-@media (max-width:560px){.mstrip{grid-template-columns:repeat(2,1fr)}}
+.meal input[type="time"]{width:118px;flex:0 0 auto;font-size:16px;padding:8px 10px;background:var(--surface)}
+.meal-n{flex:1;min-width:140px;font-size:16.5px;line-height:1.5}
+.meal-n b{display:block;font-size:14px;color:var(--ink-3);font-weight:500}
+.kcal{font-family:var(--mono);font-size:13px;color:var(--ink-3);flex:0 0 auto}
+.meal.late{background:var(--danger-wash)}
+.meal.late .meal-n b{color:var(--danger)}
+
+/* 只在列印時出現的內容（代餐橫幅、含軟便藥的完整步驟） */
+.print-only{display:none}
 
 /* ── 飲食說明（單一區塊，用小標分段） ── */
 .fboxes{display:flex;flex-direction:column;gap:20px}
@@ -548,19 +542,19 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   }
   .hy-hint{font-size:8pt;margin-top:1mm;line-height:1.3}
 
-  /* 代餐橫幅：紙本上壓扁成一排，輸入框要拆掉表單外觀 */
-  .mstrip{grid-template-columns:repeat(4,1fr);gap:2mm;margin-top:2mm}
-  .ms-card,.ms-card.late{background:none;border:.6pt solid #999;border-radius:1.5mm;padding:1.5mm 1mm;break-inside:avoid}
-  .ms-icon{max-width:10mm;padding:.6mm;border:0;background:none}
-  .ms-meal{margin-top:1mm;font-size:7.5pt;color:#000}
-  .ms-name{margin-top:.3mm;font-size:8.5pt}
-  .ms-g{margin-top:.3mm;font-size:6.8pt}
-  .ms-card input[type="time"]{
-    width:100%;margin-top:1mm;border:0;background:none;padding:0;color:#000;
-    font-size:9.5pt;font-weight:700;text-align:center;-webkit-appearance:none;appearance:none;
-  }
-  .ms-card input[type="time"]::-webkit-calendar-picker-indicator{display:none}
-  .ms-late{font-size:7pt;margin-top:.5mm;color:#000}
+  /* 代餐：紙本改用橫幅四格，螢幕版的直式清單不印 */
+  .screen-only{display:none!important}
+  .print-only{display:block}
+  .meals{display:none!important}
+  .mstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:2mm;margin-top:2mm}
+  .ms-card{border:.6pt solid #999;border-radius:1.5mm;padding:1.5mm 1mm;text-align:center;break-inside:avoid}
+  .ms-icon{width:10mm;height:10mm;margin:0 auto}
+  .ms-icon svg{width:100%;height:100%;display:block}
+  .ms-meal{margin-top:1mm;font-size:7.5pt}
+  .ms-name{margin-top:.3mm;font-size:8.5pt;font-weight:700;line-height:1.3}
+  .ms-g{margin-top:.3mm;font-size:6.8pt;color:#333}
+  .ms-time{margin-top:1mm;font-family:var(--mono);font-size:9.5pt;font-weight:700}
+  .ms-late{font-size:7pt;margin-top:.5mm;font-weight:700}
   .tbl-wrap{border:.6pt solid #999;overflow:visible}
   table{min-width:0;font-size:8.5pt}
   th,td{padding:1.2mm 2mm;line-height:1.35}
@@ -1085,14 +1079,16 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         '<li>溶解後<b>立即喝完</b>所有藥液。</li>' +
         '</ol></div>' + warnHTML();
     }
-    /* 第一劑把軟便藥收進同一串步驟，病人從頭做到尾不用跨兩段 */
-    return '<div class="brew"><ol>' +
-      '<li>先吞服<b>黃色軟便藥（Dulcolax）2 顆</b>。</li>' +
+    /* 螢幕上軟便藥另外寫在前面一段；紙本沒有那一段，所以把它收成步驟 1 */
+    var mix =
       '<li>在杯中加入<b>常溫冷水約 150 c.c.</b></li>' +
       '<li>倒入<b>一包</b>保可淨散劑。</li>' +
       '<li>攪拌約 <b>3～5 分鐘</b>至完全溶解，溶解過程水溫會略為上升，屬正常現象。</li>' +
-      '<li>溶解後<b>立即喝完</b>所有藥液。</li>' +
-      '</ol></div>' + warnHTML();
+      '<li>溶解後<b>立即喝完</b>所有藥液。</li>';
+    return '<div class="brew">' +
+      '<ol class="screen-only">' + mix + '</ol>' +
+      '<ol class="print-only"><li>先吞服<b>黃色軟便藥（Dulcolax）2 顆</b>。</li>' + mix + '</ol>' +
+      '</div>' + warnHTML();
   }
 
   function warnHTML(){
@@ -1113,22 +1109,33 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     return h;
   }
 
-  /* 四餐排成一條橫幅，每格一張圖加一個可改的時間 */
+  /* 螢幕用直式清單（時間可改），紙本用橫幅四格（時間印成文字）。
+     兩份都輸出，由 CSS 決定誰出現。 */
   function mealsHTML(){
-    var h = '<div class="mstrip">';
+    var list = '<div class="meals screen-only">';
+    var strip = '<div class="mstrip print-only" aria-hidden="true">';
+
     MEALS.forEach(function(m){
       var t = state.mealTimes[m.k];
       var late = t > "16:00";
-      h += '<div class="ms-card' + (late ? " late" : "") + '">' +
+
+      list += '<div class="meal' + (late ? " late" : "") + '">' +
+        '<input type="time" step="300" id="meal-' + m.k + '" data-meal="' + m.k + '" value="' + t + '" aria-label="' + m.meal + '時間">' +
+        '<span class="meal-n"><b>' + m.meal + (late ? "　超過 16:00" : "") + '</b>' + m.name + '　' + m.g + '</span>' +
+        '<span class="kcal">' + m.kcal + '</span>' +
+      '</div>';
+
+      strip += '<div class="ms-card">' +
         '<div class="ms-icon">' + ICONS[m.i] + '</div>' +
         '<div class="ms-meal">' + m.meal + '</div>' +
         '<div class="ms-name">' + m.name + '</div>' +
         '<div class="ms-g">' + m.g + '　' + m.kcal + '</div>' +
-        '<input type="time" step="300" id="meal-' + m.k + '" data-meal="' + m.k + '" value="' + t + '" aria-label="' + m.meal + '時間">' +
+        '<div class="ms-time">' + t + '</div>' +
         (late ? '<div class="ms-late">超過 16:00</div>' : '') +
       '</div>';
     });
-    return h + '</div>';
+
+    return list + '</div>' + strip + '</div>';
   }
 
   /* ---------- 時程 ---------- */
@@ -1162,7 +1169,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         item("", "全天", "", "改吃易暢淨低渣代餐（四餐）",
           "<p>依盒內指示，每餐擇一加熱：<strong>微波 2 分鐘</strong>，或連鋁箔袋放入沸水<strong>隔水加熱 5 分鐘</strong>後倒出。下午點心可搭配無渣飲料。</p>" +
           "<p><strong>四餐都必須在 16:00 前吃完</strong>，時間可依自己的作息調整。</p>" +
-          mealsHTML())
+          '<div class="screen-only">' + foodText(EZ_MEALS) + '</div>' + mealsHTML())
       ];
       P.push({ label:"檢查前一天", date: fmtDate(dayOf(exam, -1)), items: mi.concat(eveningItems()) });
     } else {
@@ -1205,7 +1212,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   function eveningItems(){
     return [
       item("med", "17:00", "傍晚", "黃色軟便藥 2 顆，接著保可淨第一劑",
-        "<p>軟便藥吃完後<strong>可以馬上沖泡保可淨</strong>，不需要等待。</p>" +
+        "<p class=\"screen-only\">傍晚 5 點先吞服<strong>黃色軟便藥（Dulcolax）2 顆</strong>，吃完後<strong>可以馬上沖泡保可淨</strong>，不需要等待。</p>" +
         brewHTML(true)),
       item("water", "18:00", "–22:00", "補水 1250～2000 c.c.",
         "<p>服藥 <strong>1 小時後</strong>開始陸續補水，約<strong>半小時一杯</strong>（250 c.c.），在 3～4 小時內完成。以白開水為主，可搭配運動飲料及清湯（菜湯、魚湯、肉湯）。</p>" +
