@@ -539,23 +539,25 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   .phase-head{justify-content:flex-start}
   .phase-date{order:1;margin-left:0;margin-right:3.5mm}
   .phase-head h3{order:2}
-  .tl{padding-top:1.5mm}
-  .tl-item{grid-template-columns:21mm 4mm 1fr;break-inside:avoid}
-  /* 補水那一格最高（說明＋八個杯子），不准它跨頁的話第一頁會空掉一大塊。
-     讓它可以斷，但杯子那一盒與標題不切開。 */
-  .tl-item.k-water{break-inside:auto}
-  .hydrate{break-inside:avoid}
-  .card h4{break-after:avoid}
-  .tl-when{font-size:12pt;padding-top:0}
+  /* 瀏覽器不會把 flex / grid 容器拆到下一頁。時間軸原本用它們排版，
+     一整段（最長 260mm）塞不進剩餘空間就整塊跳頁，第一頁因此空掉一大半。
+     紙本改成純 block：時間絕對定位擺左邊，軸線改成 .tl-body 的左側色條。 */
+  .tl{display:block;padding-top:1.5mm}
+  .tl-item{display:block;position:relative;padding-left:24mm;break-inside:auto}
+  .tl-when{
+    position:absolute;left:0;top:0;width:20mm;text-align:right;
+    font-size:12pt;padding-top:0;
+  }
   .tl-when small{font-size:9pt}
-  /* 圓點依步驟種類自己上色：喝藥青、補水藍、禁食紅 */
-  .tl-dot{width:2.2mm;height:2.2mm;top:2mm;border-width:0}
-  .tl-rail::before{width:.5pt}
-  .tl-item:first-child .tl-rail::before{top:2mm;height:calc(100% - 2mm)}
-  .tl-item:last-child .tl-rail::before{height:2mm}
-  .tl-body{padding:0 0 2mm 3mm}
+  .tl-rail{display:none}
+  .tl-body{padding:0 0 3mm 3mm;border-left:.9pt solid var(--rail)}
+  .tl-item.k-med .tl-body{border-left-color:var(--accent)}
+  .tl-item.k-water .tl-body{border-left-color:var(--water)}
+  .tl-item.k-stop .tl-body{border-left-color:var(--danger)}
+  .tl-item.k-exam .tl-body{border-left-color:var(--ink)}
+  .card h4{break-after:avoid}
   .card{border:0;box-shadow:none;padding:0;background:none}
-  .card.hi{border:0;border-left:1.2pt solid var(--accent);padding-left:2.5mm}
+  .card.hi{border:0;padding-left:0}
   .card h4{font-size:13.5pt;line-height:1.4;color:var(--ink)}
   .card p,.card ul,.brew ol,.foodline{font-size:12pt;line-height:1.5;margin-top:1.4mm}
   /* 粗體依情境分色，不再一律黑色 */
