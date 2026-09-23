@@ -493,17 +493,6 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 .print-btn.ghost:hover{background:var(--accent-wash)}
 .print-btn[disabled]{opacity:.55;cursor:default}
 
-/* 產生出來的時程圖 */
-.sheet-out{margin-top:20px}
-.sheet-hint{
-  font-size:15.5px;color:var(--ink);background:var(--accent-wash);
-  border-radius:10px;padding:11px 15px;line-height:1.7;
-}
-.sheet-hint b{color:var(--accent)}
-.sheet-out img{
-  display:block;width:100%;height:auto;margin-top:12px;
-  border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
-}
 
 @media print{
   @page{size:A4 portrait;margin:11mm}
@@ -922,18 +911,12 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     <div class="sec-head">
       <span class="eyebrow">帶回家</span>
       <h2>印一份紙本貼在冰箱上</h2>
-      <p class="sec-sub">填好上面的檢查日期之後，按<b>存成圖片</b>會做出一張屬於你的時程表，長按就能存進手機相簿——<b>用 Line 開啟也可以存</b>。要印在紙上就按「列印 A4」。</p>
+      <p class="sec-sub">填好上面的檢查日期之後，按下面的按鈕會印出<b>屬於你的時程表</b>，日期都已經換算好。手機按了選「<b>儲存為 PDF</b>」就能存在手機裡。</p>
     </div>
     <div class="print-actions">
-      <button type="button" class="print-btn" id="imgBtn">存成圖片</button>
-      <button type="button" class="print-btn ghost" id="printBtn">列印 A4</button>
+      <button type="button" class="print-btn" id="printBtn">列印我的清腸時程</button>
     </div>
     <p class="print-note" id="printNote">A4 直式，約 2 頁。補水的杯子會印成空格，喝完一杯自己打勾。</p>
-
-    <div class="sheet-out" id="sheetOut" hidden>
-      <p class="sheet-hint" id="sheetHint"></p>
-      <img id="sheetImg" alt="你的清腸時程表">
-    </div>
   </section>
 
   <!-- 紙本上用藥與聯絡壓成一條，取代整個區塊 -->
@@ -1509,15 +1492,16 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   var inApp = /\bLine\//i.test(UA) || /FBAN|FBAV|FB_IAB|Instagram/i.test(UA);
 
   function showOpenInBrowser(){
-    var ios = /iPhone|iPad|iPod/i.test(UA);
     printNote.className = "print-note warn";
     printNote.innerHTML =
-      "你現在是用 <b>Line 內建的瀏覽器</b>開啟，它沒有列印功能。<br>" +
-      "請點右上角的 <b>⋯</b>，選「<b>" + (ios ? "用 Safari 開啟" : "用其他瀏覽器開啟") +
-      "</b>」，再按一次這個按鈕就可以列印或存成 PDF。" +
-      "<button type=\"button\" class=\"btn\" id=\"printAnyway\">仍要試試看</button>";
-    var anyway = document.getElementById("printAnyway");
-    if (anyway) anyway.addEventListener("click", doPrint);
+      "你現在是用 <b>Line 內建的瀏覽器</b>開啟，它沒有列印功能。" +
+      "按下面這顆會用手機原本的瀏覽器重新開啟這一頁，日期不用重填，再按一次列印就可以了。";
+    var open = document.createElement("a");
+    open.className = "print-btn";
+    open.href = externalURL();
+    open.textContent = "用手機瀏覽器開啟";
+    open.style.cssText = "display:inline-block;margin-top:12px;text-decoration:none";
+    printNote.parentNode.insertBefore(open, printNote.nextSibling);
   }
 
   function doPrint(){
@@ -1541,165 +1525,16 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   /* 一進來就是 App 內建瀏覽器的話，先把話講在前面 */
   if (inApp) {
     printNote.innerHTML = NOTE_DEFAULT +
-      "<br><b>用 Line 開啟的話要先切換瀏覽器</b>：點右上角 <b>⋯</b> →「用其他瀏覽器開啟」。";
+      "<br><b>你現在是用 Line 開啟的，Line 不能列印</b>——按上面的按鈕會帶你換到手機的瀏覽器。";
   }
 
-  /* ---------- 存成圖片 ----------
-     Line 內建瀏覽器不能列印、也擋下載，但「長按圖片存到相簿」是瀏覽器原生功能，
-     WebView 擋不掉。所以把列印版整張畫成圖片顯示在頁面上讓病人長按儲存。 */
-
-  var imgBtn = document.getElementById("imgBtn");
-  var sheetOut = document.getElementById("sheetOut");
-  var sheetHint = document.getElementById("sheetHint");
-  var sheetImg = document.getElementById("sheetImg");
-  var asPrintReady = false;
-
-  function loadScript(src){
-    return new Promise(function(res, rej){
-      var t = document.createElement("script");
-      t.src = src; t.onload = res; t.onerror = rej;
-      document.head.appendChild(t);
-    });
+  /* Line 內建瀏覽器不能列印，但 Line 支援 ?openExternalBrowser=1，
+     用這個網址開啟會直接跳到手機的預設瀏覽器，列印與存 PDF 就都正常。 */
+  function externalURL(){
+    var u = location.origin + location.pathname;
+    return u + "?openExternalBrowser=1";
   }
 
-  /* 把 @media print 的規則複製一份成 .as-print，才能在螢幕上套用同一套版型，
-     由同一份來源產生，不會跟列印版走鐘 */
-  function buildAsPrintCSS(){
-    if (asPrintReady) return;
-    var txt = "", styles = document.querySelectorAll("style");
-    for (var n = 0; n < styles.length; n++) {
-      if (styles[n].textContent.indexOf("@media print{") >= 0) { txt = styles[n].textContent; break; }
-    }
-    var i = txt.indexOf("@media print{");
-    if (i < 0) return;
-    var start = txt.indexOf("{", i) + 1, depth = 1, j = start;
-    while (j < txt.length && depth > 0) {
-      if (txt[j] === "{") depth++;
-      else if (txt[j] === "}") depth--;
-      j++;
-    }
-    var body = txt.slice(start, j - 1);
-
-    function prefix(sel){
-      return sel.split(",").map(function(one){
-        one = one.trim();
-        if (!one) return "";
-        if (/^(:root|html|body)\b/.test(one)) return one.replace(/^(:root|html|body)/, ".as-print");
-        return ".as-print " + one;
-      }).filter(Boolean).join(",");
-    }
-
-    var out = [], buf = "", d = 0, sel = "";
-    for (var k = 0; k < body.length; k++) {
-      var ch = body[k];
-      if (ch === "{") { if (d === 0) { sel = buf.trim(); buf = ""; } else buf += ch; d++; }
-      else if (ch === "}") {
-        d--;
-        if (d === 0) { if (sel && sel.charAt(0) !== "@") out.push(prefix(sel) + "{" + buf + "}"); buf = ""; sel = ""; }
-        else buf += ch;
-      } else buf += ch;
-    }
-    /* 螢幕上要固定成 A4 內容寬度（210mm 減去左右邊界），圖片比例才會對 */
-    out.push(".as-print .wrap{width:718px;max-width:718px;margin:0;padding:0}");
-
-    var st = document.createElement("style");
-    st.textContent = out.join("\n");
-    document.head.appendChild(st);
-    asPrintReady = true;
-  }
-
-  /* 離屏複製一份再拍，才不會把手機上的版面撐爛。
-     複製節點不會帶走 canvas 的畫面，所以 QR 要另外換成圖片。 */
-  function renderSheet(){
-    var holder = document.createElement("div");
-    holder.className = "as-print";
-    holder.style.cssText = "position:fixed;left:-10000px;top:0;width:718px;background:#fff";
-
-    var src = document.querySelector(".wrap");
-    var clone = src.cloneNode(true);
-    holder.appendChild(clone);
-    document.body.appendChild(holder);
-
-    var srcCv = src.querySelectorAll("canvas");
-    var dstCv = clone.querySelectorAll("canvas");
-    for (var i = 0; i < dstCv.length && i < srcCv.length; i++) {
-      try {
-        var im = new Image();
-        im.src = srcCv[i].toDataURL("image/png");
-        im.className = dstCv[i].className;
-        im.style.cssText = dstCv[i].style.cssText;
-        dstCv[i].parentNode.replaceChild(im, dstCv[i]);
-      } catch (e) {}
-    }
-
-    return new Promise(function(res){ setTimeout(res, 150); })
-      .then(function(){
-        return html2canvas(clone, { backgroundColor: "#ffffff", scale: 2, useCORS: true, logging: false });
-      })
-      .then(function(canvas){ holder.remove(); return canvas; })
-      .catch(function(e){ holder.remove(); throw e; });
-  }
-
-  function canvasToBlob(canvas){
-    return new Promise(function(res){
-      if (canvas.toBlob) canvas.toBlob(res, "image/jpeg", 0.92);
-      else res(null);
-    });
-  }
-
-  /* iOS 的 WebView 長按 data: 圖片不會給「儲存影像」，所以優先走系統分享面板，
-     那裡面才有「儲存影像」。不支援的裝置再退回長按。 */
-  function offerSave(canvas, blob){
-    var file = null;
-    try {
-      if (blob && window.File) file = new File([blob], "清腸時程.jpg", { type: "image/jpeg" });
-    } catch (e) {}
-
-    var canShare = !!(file && navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share);
-    sheetImg.src = canvas.toDataURL("image/jpeg", 0.92);
-    sheetOut.hidden = false;
-
-    if (canShare) {
-      sheetHint.innerHTML =
-        "按下面的<b>儲存到手機</b>，在跳出的選單選「<b>儲存影像</b>」就會存進相簿。" +
-        "<button type=\"button\" class=\"btn\" id=\"shareBtn\">儲存到手機</button>";
-      var sb = document.getElementById("shareBtn");
-      sb.addEventListener("click", function(){
-        navigator.share({ files: [file], title: "清腸時程" }).catch(function(){});
-      });
-    } else {
-      sheetHint.innerHTML = inApp
-        ? "<b>長按下面的圖片</b>選「儲存圖片」。如果長按沒有反應，點右上角 <b>⋯</b> 用其他瀏覽器開啟這一頁再試。"
-        : "<b>長按圖片</b>（手機）或<b>按右鍵另存新檔</b>（電腦）就能存下來。";
-    }
-    sheetOut.scrollIntoView({ block: "start" });
-  }
-
-  imgBtn.addEventListener("click", function(){
-    if (!examDateObj()) {
-      printNote.textContent = "請先在上面填入檢查日期，圖片上的時程才會有日期。";
-      printNote.className = "print-note warn";
-      el.date.scrollIntoView({ block: "center" });
-      el.date.focus();
-      return;
-    }
-    imgBtn.disabled = true;
-    imgBtn.textContent = "產生中…";
-
-    loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js")
-      .then(function(){ buildAsPrintCSS(); return renderSheet(); })
-      .then(function(canvas){
-        return canvasToBlob(canvas).then(function(blob){ offerSave(canvas, blob); });
-      })
-      .catch(function(){
-        printNote.textContent = "圖片產生失敗，請改用「列印 A4」，或確認網路連線後再試一次。";
-        printNote.className = "print-note warn";
-      })
-      .then(function(){
-        imgBtn.disabled = false;
-        imgBtn.textContent = "存成圖片";
-      });
-  });
 
   /* 時程表裡的連結：跳過去時順便把摺疊的超商清單展開 */
   document.addEventListener("click", function(e){
