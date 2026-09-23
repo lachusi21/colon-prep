@@ -380,6 +380,41 @@ td b{color:var(--danger)}
 .fbox li{margin-top:7px}
 .fbox li::marker{color:var(--accent)}
 .fbox strong{color:var(--ink)}
+
+/* ── 超商篇（點開才展開，預設收起來不佔版面） ── */
+.store{
+  margin-top:20px;background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);overflow:hidden;
+}
+.store summary{
+  padding:16px 20px;font-family:var(--serif);font-weight:700;
+  font-size:clamp(17px,3.9vw,20px);color:var(--accent);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.store summary::after{
+  content:"＋";position:static;margin-left:auto;font-family:var(--mono);
+  font-size:20px;color:var(--accent);top:auto;right:auto;
+}
+.store[open] summary::after{content:"－"}
+.store-cue{
+  font-family:var(--sans);font-size:13px;font-weight:400;color:var(--ink-3);
+  border:1px solid var(--line-strong);border-radius:99px;padding:2px 11px;
+}
+.store[open] .store-cue{display:none}
+.store-body{padding:0 20px 20px}
+.store-groups{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+  gap:14px;margin-top:16px;
+}
+.store-groups > div{background:var(--surface-2);border-radius:11px;padding:13px 15px}
+.store-groups h4{
+  margin:0;font-family:var(--sans);font-size:14px;font-weight:700;color:var(--accent);
+  letter-spacing:.04em;
+}
+.store-groups p{margin-top:6px;font-size:15.5px;line-height:1.75;color:var(--ink-2)}
+.store-img{display:block;margin-top:18px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.store-img img{display:block;width:100%;height:auto}
+.store-hint{margin-top:9px;font-size:13px;color:var(--ink-3);text-align:center}
 .line-card{
   display:flex;gap:20px;align-items:center;flex-wrap:wrap;
   background:var(--surface);border:1.5px solid var(--line-green);
@@ -505,6 +540,34 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
       <p class="sec-sub" id="dietSub"></p>
     </div>
     <div id="dietBody"></div>
+
+    <details class="store">
+      <summary>在超商買得到的低渣食物<span class="store-cue">點開看清單</span></summary>
+      <div class="store-body">
+        <p class="foodline">不想自己準備的話，以下都是便利商店就買得到的低渣選擇。<strong>檢查前一天起就不能再吃固體食物</strong>，這些只適用於低渣飲食那幾天。</p>
+
+        <div class="store-groups">
+          <div>
+            <h4>肉、魚、蛋類</h4>
+            <p>茶葉蛋（避免滷製過久的蛋）、溫泉蛋、水煮蛋、原味雞胸肉、水煮鮪魚罐頭</p>
+          </div>
+          <div>
+            <h4>主食類</h4>
+            <p>白飯、白吐司、冬粉、蜂蜜蛋糕</p>
+          </div>
+          <div>
+            <h4>飲品點心類</h4>
+            <p>甜愛玉、旺仔小饅頭、營養口糧、冬瓜茶、檸檬水、蘋果汁、梅子綠茶、紅茶</p>
+          </div>
+        </div>
+
+        <a class="store-img" href="convenience-store.jpg" target="_blank" rel="noopener">
+          <img src="convenience-store.jpg" loading="lazy" decoding="async"
+               alt="周中凱腸胃內科 北峰聯合診所「低渣飲食好選擇 — 超商篇」海報，分成肉魚蛋類、主食類、飲品點心類三組，附商品照片。">
+        </a>
+        <p class="store-hint">點圖片可以放大看</p>
+      </div>
+    </details>
   </section>
 
   <!-- 清腸目標 -->
