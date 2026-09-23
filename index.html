@@ -236,7 +236,8 @@ input[type="date"],input[type="time"]{
 }
 .tl-item.k-med .tl-dot{border-color:var(--accent);background:var(--accent)}
 .tl-item.k-water .tl-dot{border-color:var(--water);background:var(--water)}
-.tl-item.k-stop .tl-dot{border-color:var(--danger);background:var(--danger)}
+.tl-item.k-stop .tl-dot,
+.tl-item.k-call .tl-dot{border-color:var(--danger);background:var(--danger)}
 .tl-item.k-line .tl-dot{border-color:var(--line-green);background:var(--line-green)}
 .tl-item.k-line .card{border-color:var(--line-green);border-width:1.5px;padding:15px 17px}
 .tl-item.k-exam .tl-dot{border-color:var(--ink);background:var(--ink);width:14px;height:14px}
@@ -562,7 +563,9 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   .print-only{display:block}
   .meals{display:none!important}
   /* 20:00 的 Line 關心併進上面的排便那一格 */
-  .tl-item.k-line{display:none!important}
+  /* 20:00 的 Line 關心併進上面那一格，21:00 的來電提醒紙本不印 */
+  .tl-item.k-line,
+  .tl-item.k-call{display:none!important}
 
   /* 自主飲食的食物改用圖示橫幅 */
   .fstrip{display:grid;gap:1.4mm;margin-top:1.6mm}
@@ -1269,7 +1272,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
       item("line", "20:00", "", "診所會用 Line 關心你",
         "<p>晚上 8 點，我們會透過 Line 傳訊息詢問你目前的<strong>解便次數</strong>與<strong>補水狀況</strong>，請記得回覆。</p>" +
         "<p>回覆前可以先看一下上面補水那一格<strong>已經點了幾個杯子</strong>，直接把杯數告訴我們就可以。</p>"),
-      item("stop", "21:00", "", "若仍未排便，請來訊詢問",
+      item("call", "21:00", "", "若仍未排便，請來訊詢問",
         "<p>晚上 9 點尚未排便，或出現嚴重不適，請透過診所 Line <strong>@420genld</strong> 留言，或撥打 24 小時免付費諮詢專線 <a href=\"tel:0800060689\">0800-060-689</a>。</p>")
     ];
   }
@@ -1299,7 +1302,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         html += '<div class="tl-item' + (it.kind ? " k-" + it.kind : "") + '">' +
           '<div class="tl-when">' + it.time + (it.sub ? '<small>' + it.sub + '</small>' : '') + '</div>' +
           '<div class="tl-rail"><span class="tl-dot"></span></div>' +
-          '<div class="tl-body"><div class="card' + (it.kind === "med" || it.kind === "stop" ? " hi" : "") + '">' +
+          '<div class="tl-body"><div class="card' + (it.kind === "med" || it.kind === "stop" || it.kind === "call" ? " hi" : "") + '">' +
             '<h4>' + it.title + '</h4>' + it.body +
           '</div></div></div>';
       });
