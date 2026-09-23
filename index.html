@@ -548,6 +548,14 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   .meals{display:none!important}
   /* 20:00 的 Line 關心併進上面的排便那一格 */
   .tl-item.k-line{display:none!important}
+
+  /* 自主飲食的食物改用圖示橫幅 */
+  .fstrip{display:grid;gap:1.4mm;margin-top:1.6mm}
+  .fs-card{text-align:center;border:.5pt solid #bbb;border-radius:1mm;padding:1mm .4mm .8mm;break-inside:avoid}
+  .fs-icon{width:9.5mm;height:9.5mm;margin:0 auto}
+  .fs-icon svg{width:100%;height:100%;display:block}
+  .fs-name{margin-top:.6mm;font-size:7pt;line-height:1.25}
+  .fs-name small{display:block;font-size:6pt;color:#444}
   .mstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:2mm;margin-top:2mm}
   .ms-card{border:.6pt solid #999;border-radius:1.5mm;padding:1.5mm 1mm;text-align:center;break-inside:avoid}
   .ms-icon{width:10mm;height:10mm;margin:0 auto}
@@ -1033,6 +1041,16 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     }).join('、') + '</p>';
   }
 
+  /* 紙本用的圖示橫幅：一排幾格由 cols 決定 */
+  function foodStrip(list, cols){
+    var h = '<div class="fstrip print-only" aria-hidden="true" style="grid-template-columns:repeat(' + cols + ',1fr)">';
+    list.forEach(function(f){
+      h += '<div class="fs-card"><div class="fs-icon">' + ICONS[f.i] + '</div>' +
+           '<div class="fs-name">' + f.n + (f.s ? '<small>' + f.s.replace(/<br>/g, '') + '</small>' : '') + '</div></div>';
+    });
+    return h + '</div>';
+  }
+
   function foodGrid(list){
     var h = '<div class="fgrid">';
     list.forEach(function(f){
@@ -1180,13 +1198,15 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         date: fmtDate(dayOf(exam, -2)),
         items: [
           item("", "全天", "", "開始低渣飲食",
-            "<p>這一天起<strong>只能吃</strong>下列食物：</p>" + foodText(LOW_RESIDUE) +
+            "<p>這一天起<strong>只能吃</strong>下列食物：</p>" +
+            '<div class="screen-only">' + foodText(LOW_RESIDUE) + '</div>' + foodStrip(LOW_RESIDUE, 8) +
             "<p class=\"stop-line\"><strong>一律停掉</strong>" + STOP_LIST + "</p>")
         ]
       });
       var si = [
         item("", "全天", "", "只可飲用無渣流質飲食",
-          "<p>這一天<strong>不再吃任何固體食物</strong>，只喝清澈飲料與澄清湯：</p>" + foodText(CLEAR_FLUIDS))
+          "<p>這一天<strong>不再吃任何固體食物</strong>，只喝清澈飲料與澄清湯：</p>" +
+          '<div class="screen-only">' + foodText(CLEAR_FLUIDS) + '</div>' + foodStrip(CLEAR_FLUIDS, 5))
       ];
       P.push({ label:"檢查前一天", date: fmtDate(dayOf(exam, -1)), items: si.concat(eveningItems()) });
     }
