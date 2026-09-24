@@ -1368,6 +1368,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     updateTotals();
     updateCountdown(exam);
     updatePrintHead();
+    if (typeof refreshEscape === "function") refreshEscape();
   }
 
   function bindCups(){
@@ -1547,9 +1548,19 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     } catch(e){ done(false); }
   }
 
-  function showOpenInBrowser(){
+  /* 病人可能先看到面板才改日期，連結要跟著換，不然帶過去的是舊日期 */
+  function refreshEscape(){
     var box = document.getElementById("appEscape");
-    if (box) { box.scrollIntoView({ block:"center" }); return; }
+    if (!box) return;
+    var a = box.querySelector("a.escape-go");
+    if (a) a.href = a.getAttribute("data-kind") === "intent" ? intentURL() : externalURL();
+    var u = box.querySelector(".escape-url");
+    if (u) u.textContent = pageURL();
+  }
+
+  function showOpenInBrowser(auto){
+    var box = document.getElementById("appEscape");
+    if (box) { if (!auto) box.scrollIntoView({ block:"center" }); return; }
 
     printNote.className = "print-note warn";
     printNote.innerHTML = "你現在是用 <b>" + appName + " 內建的瀏覽器</b>開啟這一頁，它沒有列印功能。";
@@ -1561,7 +1572,8 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     if (isLine) {
       box.innerHTML = "<p>按下面這顆，會用手機原本的瀏覽器重新開啟，<b>日期與飲食方式都會帶過去</b>，再按一次列印就可以。</p>";
       var go = document.createElement("a");
-      go.className = "print-btn";
+      go.className = "print-btn escape-go";
+      go.setAttribute("data-kind", "line");
       go.href = externalURL();
       go.textContent = "用手機瀏覽器開啟";
       box.appendChild(go);
@@ -1571,7 +1583,8 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         "換成 Safari 或 Chrome 之後就印得出來。也可以複製下面的網址，自己貼到瀏覽器。</p>";
       if (isAndroid) {
         var chrome = document.createElement("a");
-        chrome.className = "print-btn";
+        chrome.className = "print-btn escape-go";
+        chrome.setAttribute("data-kind", "intent");
         chrome.href = intentURL();
         chrome.textContent = "用手機瀏覽器開啟";
         box.appendChild(chrome);
@@ -1589,7 +1602,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     }
 
     printNote.parentNode.insertBefore(box, printNote.nextSibling);
-    box.scrollIntoView({ block:"center" });
+    if (!auto) box.scrollIntoView({ block:"center" });
   }
 
   function doPrint(){
@@ -1610,11 +1623,6 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     doPrint();
   });
 
-  /* 一進來就是 App 內建瀏覽器的話，先把話講在前面 */
-  if (inApp) {
-    printNote.innerHTML = NOTE_DEFAULT +
-      "<br><b>你現在是用 " + appName + " 開啟的，它不能列印</b>——按上面的按鈕，會告訴你怎麼換到手機的瀏覽器。";
-  }
 
   /* 換瀏覽器等於換一份 localStorage，填過的日期不會跟著走，所以放進網址。 */
   function pageURL(){
@@ -1653,6 +1661,9 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   })();
 
   setMode(state.useMeal);
+  /* App 內建瀏覽器一定要換出去才印得出來，進站就把按鈕鋪好，病人少按一次。
+     擺在 seed() 之後，網址裡才帶得到日期。 */
+  if (inApp) showOpenInBrowser(true);
   setInterval(function(){
     var e = examDateObj();
     if (e) updateCountdown(e);
