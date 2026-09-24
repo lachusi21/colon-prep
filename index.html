@@ -515,7 +515,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     font-size:12pt;line-height:1.5;color:var(--ink);
     -webkit-print-color-adjust:exact;print-color-adjust:exact;
   }
-  .wrap{max-width:100%;padding:0}
+  .wrap{width:170mm;max-width:100%;margin:0 auto;padding:0}
 
   /* 螢幕上才有意義的、或已在時程表中重複的內容都不印 */
   .masthead,.setup,.sec-diet,.sec-faq,.sec-print,.sec-target,.sec-post,
@@ -533,6 +533,8 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 
   /* 時程表：拿掉卡片外框，只留左側時間軸，密度最高 */
   .phase{margin-top:2.2mm;break-inside:auto}
+  /* 讓分頁固定落在這裡，不隨裝置的字寬差異飄移 */
+  #schedule .phase:last-child{break-before:page;margin-top:0}
   .phase-head{background:var(--accent-wash);border-radius:1.4mm;border-bottom:0;padding:.8mm 2.5mm;gap:6px;break-after:avoid;break-inside:avoid}
   .phase-head h3{color:var(--accent);font-size:13pt;line-height:1.3}
   .phase-date,.fh-day{color:var(--ink-2);font-size:12pt}
@@ -567,7 +569,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   .card ul{padding-left:5.5mm}
   .card li{margin-top:.5mm}
 
-  .brew{background:var(--accent-wash);border-left:1.2pt solid var(--accent);border-radius:0 1mm 1mm 0;padding:.8mm 2mm .8mm 3mm;margin-top:.8mm}
+  .brew{background:var(--accent-wash);border-left:1.2pt solid var(--accent);border-radius:0 1mm 1mm 0;padding:.8mm 2mm .8mm 3mm;margin-top:.8mm;break-inside:avoid}
   .brew ol{padding-left:7mm}
   .brew li{margin-top:.3mm}
   .warn-strip{background:var(--danger-wash);border:.8pt solid var(--danger);border-radius:1mm;padding:.5mm 2mm;margin-top:.8mm;gap:1.5mm}
@@ -576,7 +578,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   .stop-line strong{background:var(--danger-wash);border:0;color:var(--danger);font-size:10.5pt;padding:.3mm 1.8mm;border-radius:1mm}
 
   /* 補水杯一律印成空格，讓病人喝完一杯自己打勾 */
-  .hydrate{background:var(--water-wash);border:0;border-radius:1.2mm;padding:.7mm 2mm;margin-top:.8mm}
+  .hydrate{background:var(--water-wash);border:0;border-radius:1.2mm;padding:.7mm 2mm;margin-top:.8mm;break-inside:avoid}
   .hy-top b,.hy-total{color:var(--water);font-size:11pt}
   .cups{gap:1.1mm;margin-top:.8mm}
   .cup,.cup[aria-pressed="true"]{
@@ -1134,7 +1136,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     { i:"sugarcane",    n:"甘蔗汁" },
     { i:"coconut",      n:"椰子水" },
     { i:"honey",        n:"蜂蜜水" },
-    { i:"soup",         n:"澄清湯", s:"菜湯、肉湯、魚湯<br>料不能吃" }
+    { i:"soup",         n:"澄清湯", s:"料要濾掉" }
   ];
   var EZ_MEALS = [
     { i:"congeeChicken", n:"活力雞蓉粥", s:"早餐 260g" },
@@ -1285,7 +1287,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
           "<p class=\"screen-only\">從早上 6 點起<strong>連水都不要喝</strong>。這是麻醉安全的規定——胃裡有液體做鎮靜麻醉會有嗆入肺部的風險。</p>" +
           "<p class=\"print-only\">從早上 6 點起<strong>連水都不要喝</strong>（麻醉安全規定）。</p>"),
         item("exam", "上午", "依約定時間", "大腸鏡檢查",
-          "<p>請攜帶健保卡，並依診所給您的報到時間到診所。<strong>自費麻醉者須家屬陪同</strong>，檢查當天不可自行開車或騎車。</p>")
+          "<p>請攜帶<strong>健保卡與檢查同意書</strong>，並依診所給您的報到時間到診所。<strong>自費麻醉者須家屬陪同</strong>，檢查當天不可自行開車或騎車。</p>")
       ]
     });
 
@@ -1298,13 +1300,14 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
         "<p class=\"screen-only\">傍晚 5 點先吞服<strong>黃色軟便藥（Dulcolax）2 顆</strong>，吃完後<strong>可以馬上沖泡保可淨</strong>，不需要等待。</p>" +
         brewHTML(true)),
       item("water", "18:00", "–22:00", "補水 1250～2000 c.c.",
-        "<p>服藥 <strong>1 小時後</strong>開始陸續補水，約<strong>半小時一杯</strong>（250 c.c.），在 3～4 小時內完成。以白開水為主，可搭配運動飲料及清湯（菜湯、魚湯、肉湯）。</p>" +
+        "<p class=\"screen-only\">服藥 <strong>1 小時後</strong>開始陸續補水，約<strong>半小時一杯</strong>（250 c.c.），在 3～4 小時內完成。以白開水為主，可搭配運動飲料及清湯（菜湯、魚湯、肉湯）。</p>" +
+        "<p class=\"print-only\">服藥 <strong>1 小時後</strong>開始，<strong>半小時一杯</strong>（250 c.c.），3～4 小時內喝完。</p>" +
         cupsHTML("w1", 8, 5, "第一劑補水", "1250～2000",
           '<span class="screen-only">實線杯為<b>最低要求 5 杯（1250 c.c.）</b>，虛線杯為建議再加的 3 杯。喝完一杯就點一下。</span>' +
-          '<span class="print-only">實線杯為<b>最低要求 5 杯（1250 c.c.）</b>，虛線杯為建議再加的 3 杯，共喝 8 杯，清腸效果最好。</span>')),
+          '<span class="print-only">實線 5 杯為<b>最低要求</b>，虛線 3 杯建議加喝，共 8 杯最乾淨。</span>')),
       item("", "20:00", "約", "開始排便",
-        "<p>大約在服藥後 3 小時。請<strong>多走動、按摩腹部</strong>幫助排便，期間會有數次排便，屬正常現象。</p>" +
-        "<p class=\"print-only\">晚上 8 點，診所會用 <strong>Line</strong> 詢問你的解便次數與補水杯數，請記得回覆。</p>"),
+        "<p class=\"screen-only\">大約在服藥後 3 小時。請<strong>多走動、按摩腹部</strong>幫助排便，期間會有數次排便，屬正常現象。</p>" +
+        "<p class=\"print-only\">大約在服藥後 3 小時，請<strong>多走動、按摩腹部</strong>幫助排便。晚上 8 點診所會用 <strong>Line</strong> 問你的解便次數與補水杯數，請記得回覆。</p>"),
       item("line", "20:00", "", "診所會用 Line 關心你",
         "<p>晚上 8 點，我們會透過 Line 傳訊息詢問你目前的<strong>解便次數</strong>與<strong>補水狀況</strong>，請記得回覆。</p>" +
         "<p>回覆前可以先看一下上面補水那一格<strong>已經點了幾個杯子</strong>，直接把杯數告訴我們就可以。</p>"),
