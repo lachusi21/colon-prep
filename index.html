@@ -310,16 +310,6 @@ input[type="date"],input[type="time"]{
 /* 只在列印時出現的內容（代餐橫幅、含軟便藥的完整步驟） */
 .print-only{display:none}
 
-/* 跳到超商清單的連結 */
-.store-link{
-  display:inline-flex;align-items:center;gap:7px;margin-top:4px;
-  font-size:15.5px;font-weight:500;color:var(--accent);text-decoration:none;
-  background:var(--accent-wash);border-radius:99px;padding:7px 15px;
-}
-.store-link::after{content:"↓";font-family:var(--mono);font-weight:700}
-.store-link:hover{background:var(--accent);color:var(--surface)}
-:root[data-theme="dark"] .store-link:hover{color:#0C1A1B}
-
 /* ── 飲食說明（單一區塊，用小標分段） ── */
 .fboxes{display:flex;flex-direction:column;gap:20px}
 .fbox{
@@ -396,7 +386,6 @@ td b{color:var(--danger)}
 .fbox strong{color:var(--ink)}
 
 /* ── 超商篇（點開才展開，預設收起來不佔版面） ── */
-.store[hidden]{display:none}
 .store{
   margin-top:20px;background:var(--surface);border:1px solid var(--line);
   border-radius:14px;box-shadow:var(--shadow);overflow:hidden;
@@ -751,34 +740,6 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
       <p class="sec-sub" id="dietSub"></p>
     </div>
     <div id="dietBody"></div>
-
-    <details class="store" id="store">
-      <summary>在超商買得到的低渣食物<span class="store-cue">點開看清單</span></summary>
-      <div class="store-body">
-        <p class="foodline">不想自己準備的話，以下都是便利商店就買得到的低渣選擇。<strong>檢查前一天起就不能再吃固體食物</strong>，這些只適用於低渣飲食那幾天。</p>
-
-        <div class="store-groups">
-          <div>
-            <h4>肉、魚、蛋類</h4>
-            <p>茶葉蛋（避免滷製過久的蛋）、溫泉蛋、水煮蛋、原味雞胸肉、水煮鮪魚罐頭</p>
-          </div>
-          <div>
-            <h4>主食類</h4>
-            <p>白飯、白吐司、冬粉、蜂蜜蛋糕</p>
-          </div>
-          <div>
-            <h4>飲品點心類</h4>
-            <p>甜愛玉、旺仔小饅頭、營養口糧、冬瓜茶、檸檬水、蘋果汁、梅子綠茶、紅茶</p>
-          </div>
-        </div>
-
-        <a class="store-img" href="convenience-store.jpg" target="_blank" rel="noopener">
-          <img src="convenience-store.jpg" loading="lazy" decoding="async"
-               alt="周中凱腸胃內科 北峰聯合診所「低渣飲食好選擇 — 超商篇」海報，分成肉魚蛋類、主食類、飲品點心類三組，附商品照片。">
-        </a>
-        <p class="store-hint">點圖片可以放大看</p>
-      </div>
-    </details>
   </section>
 
   <!-- 清腸目標 -->
@@ -994,8 +955,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     reset: document.getElementById("reset"),
     dietTitle: document.getElementById("dietTitle"),
     dietSub: document.getElementById("dietSub"),
-    dietBody: document.getElementById("dietBody"),
-    store: document.getElementById("store")
+    dietBody: document.getElementById("dietBody")
   };
 
   function pad(n){ return n < 10 ? "0" + n : "" + n; }
@@ -1289,7 +1249,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
             "<p>這一天起<strong>只能吃</strong>下列食物：</p>" +
             '<div class="screen-only">' + foodText(LOW_RESIDUE) + '</div>' + foodStrip(LOW_RESIDUE, 8) +
             "<p class=\"stop-line\"><strong>一律停掉</strong>" + STOP_LIST + "</p>" +
-            "<p class=\"screen-only\"><a class=\"store-link\" href=\"#store\">不想自己準備？看超商買得到的低渣食物</a></p>")
+            '<div class="screen-only">' + STORE_HTML + '</div>')
         ]
       });
       var si = [
@@ -1426,12 +1386,38 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     else                 el.cd.innerHTML = "檢查日期已過";
   }
 
-  function renderDiet(){
-    /* 代餐組前二天照常吃、前一天吃代餐，沒有一天要自己準備低渣食物，
-       超商清單對他們是多餘的，只留給自主飲食組。 */
-    el.store.open = false;
-    el.store.hidden = state.useMeal;
+  /* 超商清單只對自主飲食組有意義，而且要貼在「檢查前二天」那一段旁邊；
+     放在飲食區塊最後面會接在「只能喝無渣流質」後頭，看起來像前一天也能買。 */
+  var STORE_HTML =
+    "<details class=\"store\">" +
+    "  <summary>在超商買得到的低渣食物<span class=\"store-cue\">點開看清單</span></summary>" +
+    "  <div class=\"store-body\">" +
+    "    <p class=\"foodline\">不想自己準備的話，以下都是便利商店就買得到的低渣選擇。<strong>檢查前一天起就不能再吃固體食物</strong>，這些只適用於低渣飲食那幾天。</p>" +
+    "" +
+    "    <div class=\"store-groups\">" +
+    "      <div>" +
+    "        <h4>肉、魚、蛋類</h4>" +
+    "        <p>茶葉蛋（避免滷製過久的蛋）、溫泉蛋、水煮蛋、原味雞胸肉、水煮鮪魚罐頭</p>" +
+    "      </div>" +
+    "      <div>" +
+    "        <h4>主食類</h4>" +
+    "        <p>白飯、白吐司、冬粉、蜂蜜蛋糕</p>" +
+    "      </div>" +
+    "      <div>" +
+    "        <h4>飲品點心類</h4>" +
+    "        <p>甜愛玉、旺仔小饅頭、營養口糧、冬瓜茶、檸檬水、蘋果汁、梅子綠茶、紅茶</p>" +
+    "      </div>" +
+    "    </div>" +
+    "" +
+    "    <a class=\"store-img\" href=\"convenience-store.jpg\" target=\"_blank\" rel=\"noopener\">" +
+    "      <img src=\"convenience-store.jpg\" loading=\"lazy\" decoding=\"async\"" +
+    "           alt=\"周中凱腸胃內科 北峰聯合診所「低渣飲食好選擇 — 超商篇」海報，分成肉魚蛋類、主食類、飲品點心類三組，附商品照片。\">" +
+    "    </a>" +
+    "    <p class=\"store-hint\">點圖片可以放大看</p>" +
+    "  </div>" +
+    "</details>";
 
+  function renderDiet(){
     var fluidNote = '<p class="foodline">只能喝<strong>透光、看得見杯子對面手指</strong>的液體，而且<strong>料一律不能吃</strong>——菜湯的菜、魚湯的魚、肉湯的肉都要濾掉。</p>';
 
     if (state.useMeal) {
@@ -1549,14 +1535,6 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     return u + "?openExternalBrowser=1";
   }
 
-
-  /* 時程表裡的連結：跳過去時順便把摺疊的超商清單展開 */
-  document.addEventListener("click", function(e){
-    var a = e.target.closest && e.target.closest('a[href="#store"]');
-    if (!a) return;
-    var d = document.getElementById("store");
-    if (d) d.open = true;
-  });
 
   el.date.addEventListener("change", renderSchedule);
   el.reset.addEventListener("click", function(){
