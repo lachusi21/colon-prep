@@ -533,8 +533,9 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 
   /* 時程表：拿掉卡片外框，只留左側時間軸，密度最高 */
   .phase{margin-top:2.2mm;break-inside:auto}
-  /* 讓分頁固定落在這裡，不隨裝置的字寬差異飄移 */
-  #schedule .phase:last-child{break-before:page;margin-top:0}
+  /* 分頁要落在「檢查當天」之前。強制 break-before 手機的列印服務會整段吃掉，
+     改用 break-inside：這一段 181mm 放得進一頁，瀏覽器就會整段帶到第二頁。 */
+  #schedule .phase:last-child{break-inside:avoid}
   .phase-head{background:var(--accent-wash);border-radius:1.4mm;border-bottom:0;padding:.8mm 2.5mm;gap:6px;break-after:avoid;break-inside:avoid}
   .phase-head h3{color:var(--accent);font-size:13pt;line-height:1.3}
   .phase-date,.fh-day{color:var(--ink-2);font-size:12pt}
