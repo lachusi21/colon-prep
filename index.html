@@ -273,6 +273,13 @@ input[type="date"],input[type="time"]{
   flex:0 0 auto;line-height:1.4;
 }
 .warn-strip span{font-size:15.5px;color:var(--ink-2);line-height:1.65}
+/* 手機上並排的標題吃掉一半寬度，剩下的字被擠成四五行，整塊紅框很突兀。
+   窄螢幕改成一段文字，標題當句首，高度大約砍一半。 */
+@media screen and (max-width:560px){
+  .warn-strip{display:block;padding:9px 12px;margin-top:10px;border-width:1.2px}
+  .warn-strip .big{font-size:15.5px;line-height:1.6;margin-right:.3em}
+  .warn-strip span{font-size:14.5px;line-height:1.6}
+}
 
 /* 補水計數 */
 .hydrate{margin-top:13px;background:var(--water-wash);border-radius:10px;padding:14px 16px}
