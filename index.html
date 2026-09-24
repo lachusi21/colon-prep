@@ -733,11 +733,11 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
     <div class="setup">
       <p class="q-label">你採用哪一種檢查前飲食？</p>
       <div class="choice">
-        <button type="button" id="optSelf" aria-pressed="false">
+        <button type="button" id="optSelf" aria-pressed="true">
           自主飲食控制
           <small>檢查前二天開始低渣飲食</small>
         </button>
-        <button type="button" id="optMeal" aria-pressed="true">
+        <button type="button" id="optMeal" aria-pressed="false">
           使用易暢淨低渣代餐
           <small>只需檢查前一天吃代餐</small>
         </button>
@@ -957,7 +957,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   var STORE = "zck-prep-v1";
   var DAY = 86400000;
 
-  var state = { useMeal: true, cups: {}, mealTimes: { b:"07:00", l:"11:30", s:"14:00", d:"15:30" } };
+  var state = { useMeal: false, cups: {}, mealTimes: { b:"07:00", l:"11:30", s:"14:00", d:"15:30" } };
 
   try {
     var raw = localStorage.getItem(STORE);
