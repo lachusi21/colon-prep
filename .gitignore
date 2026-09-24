@@ -4,3 +4,6 @@ colonoscopy-prep.html
 # 用來檢視列印版型的暫存檔
 _printpreview.html
 _check.js
+
+# UA 模擬用的暫存檔
+_ua-*.html

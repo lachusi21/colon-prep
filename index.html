@@ -493,6 +493,19 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 :root[data-theme="dark"] .print-btn.ghost{color:var(--accent)}
 .print-btn.ghost:hover{background:var(--accent-wash)}
 .print-btn[disabled]{opacity:.55;cursor:default}
+/* App 內建瀏覽器印不出來時，說明怎麼換到手機瀏覽器 */
+.escape{
+  margin-top:14px;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:15px 16px;box-shadow:var(--shadow);
+}
+.escape p{font-size:15px;line-height:1.75;color:var(--ink-2)}
+.escape p b{color:var(--ink)}
+.escape .print-btn{margin-top:12px;margin-right:10px;display:inline-block;text-decoration:none;font-size:16px;padding:12px 22px}
+.escape-url{
+  margin-top:11px;font-family:var(--mono);font-size:13px;color:var(--accent);
+  background:var(--accent-wash);border-radius:8px;padding:9px 11px;
+  line-height:1.55;word-break:break-all;user-select:all;-webkit-user-select:all;
+}
 
 
 @media print{
@@ -1503,20 +1516,80 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 
   /* Line、Facebook 等 App 內建的瀏覽器沒有列印功能，window.print() 按了不會有反應。
      這種情況直接給操作步驟，不要讓病人一直按。 */
+  /* App 內建的瀏覽器都沒有列印功能。Line 認得 ?openExternalBrowser=1，按一下
+     就會換到手機的預設瀏覽器；FB、IG 沒有這種參數，只能請民眾自己從選單開，
+     所以另外附上複製網址，Android 再多給一個 intent 連結。 */
   var UA = navigator.userAgent || "";
-  var inApp = /\bLine\//i.test(UA) || /FBAN|FBAV|FB_IAB|Instagram/i.test(UA);
+  var isLine  = /\bLine\//i.test(UA);
+  var isIG    = /Instagram/i.test(UA);
+  var isMeta  = isIG || /FBAN|FBAV|FB_IAB|FBIOS|Messenger|Barcelona/i.test(UA);
+  var isOther = /MicroMessenger|KAKAOTALK|TikTok|Twitter/i.test(UA);
+  var inApp   = isLine || isMeta || isOther;
+  var isAndroid = /Android/i.test(UA);
+  var appName = isLine ? "Line" : isIG ? "Instagram" : isMeta ? "Facebook" : "這個 App";
+
+  function copyURL(btn){
+    var url = pageURL();
+    function done(ok){ btn.textContent = ok ? "已複製，貼到瀏覽器即可" : "請長按下面的網址複製"; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function(){ done(true); }, function(){ done(false); });
+      return;
+    }
+    try {
+      var t = document.createElement("textarea");
+      t.value = url;
+      t.style.cssText = "position:fixed;top:0;opacity:0";
+      document.body.appendChild(t);
+      t.select(); t.setSelectionRange(0, url.length);
+      var ok = document.execCommand("copy");
+      document.body.removeChild(t);
+      done(ok);
+    } catch(e){ done(false); }
+  }
 
   function showOpenInBrowser(){
+    var box = document.getElementById("appEscape");
+    if (box) { box.scrollIntoView({ block:"center" }); return; }
+
     printNote.className = "print-note warn";
-    printNote.innerHTML =
-      "你現在是用 <b>Line 內建的瀏覽器</b>開啟，它沒有列印功能。" +
-      "按下面這顆會用手機原本的瀏覽器重新開啟這一頁，日期不用重填，再按一次列印就可以了。";
-    var open = document.createElement("a");
-    open.className = "print-btn";
-    open.href = externalURL();
-    open.textContent = "用手機瀏覽器開啟";
-    open.style.cssText = "display:inline-block;margin-top:12px;text-decoration:none";
-    printNote.parentNode.insertBefore(open, printNote.nextSibling);
+    printNote.innerHTML = "你現在是用 <b>" + appName + " 內建的瀏覽器</b>開啟這一頁，它沒有列印功能。";
+
+    box = document.createElement("div");
+    box.className = "escape";
+    box.id = "appEscape";
+
+    if (isLine) {
+      box.innerHTML = "<p>按下面這顆，會用手機原本的瀏覽器重新開啟，<b>日期與飲食方式都會帶過去</b>，再按一次列印就可以。</p>";
+      var go = document.createElement("a");
+      go.className = "print-btn";
+      go.href = externalURL();
+      go.textContent = "用手機瀏覽器開啟";
+      box.appendChild(go);
+    } else {
+      box.innerHTML =
+        "<p>請點畫面<b>右上角的 ⋯</b>（iPhone 在右下角的分享鈕裡），選「<b>用瀏覽器開啟</b>」或「Open in browser」，" +
+        "換成 Safari 或 Chrome 之後就印得出來。也可以複製下面的網址，自己貼到瀏覽器。</p>";
+      if (isAndroid) {
+        var chrome = document.createElement("a");
+        chrome.className = "print-btn";
+        chrome.href = intentURL();
+        chrome.textContent = "用手機瀏覽器開啟";
+        box.appendChild(chrome);
+      }
+      var cp = document.createElement("button");
+      cp.type = "button";
+      cp.className = "print-btn ghost";
+      cp.textContent = "複製網址";
+      cp.addEventListener("click", function(){ copyURL(cp); });
+      box.appendChild(cp);
+      var u = document.createElement("p");
+      u.className = "escape-url";
+      u.textContent = pageURL();
+      box.appendChild(u);
+    }
+
+    printNote.parentNode.insertBefore(box, printNote.nextSibling);
+    box.scrollIntoView({ block:"center" });
   }
 
   function doPrint(){
@@ -1540,14 +1613,21 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   /* 一進來就是 App 內建瀏覽器的話，先把話講在前面 */
   if (inApp) {
     printNote.innerHTML = NOTE_DEFAULT +
-      "<br><b>你現在是用 Line 開啟的，Line 不能列印</b>——按上面的按鈕會帶你換到手機的瀏覽器。";
+      "<br><b>你現在是用 " + appName + " 開啟的，它不能列印</b>——按上面的按鈕，會告訴你怎麼換到手機的瀏覽器。";
   }
 
-  /* Line 內建瀏覽器不能列印，但 Line 支援 ?openExternalBrowser=1，
-     用這個網址開啟會直接跳到手機的預設瀏覽器，列印與存 PDF 就都正常。 */
-  function externalURL(){
-    var u = location.origin + location.pathname;
-    return u + "?openExternalBrowser=1";
+  /* 換瀏覽器等於換一份 localStorage，填過的日期不會跟著走，所以放進網址。 */
+  function pageURL(){
+    var q = ["m=" + (state.useMeal ? "meal" : "self")];
+    if (el.date.value) q.unshift("d=" + el.date.value);
+    return location.href.split("#")[0].split("?")[0] + "?" + q.join("&");
+  }
+  /* Line 支援 ?openExternalBrowser=1，用這個網址開會直接跳到預設瀏覽器 */
+  function externalURL(){ return pageURL() + "&openExternalBrowser=1"; }
+  /* Android 的 App 內建瀏覽器可以用 intent 把網址交給系統挑瀏覽器 */
+  function intentURL(){
+    return "intent://" + pageURL().replace(/^https?:\/\//, "") +
+      "#Intent;scheme=https;action=android.intent.action.VIEW;end";
   }
 
 
@@ -1560,6 +1640,14 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 
   /* 預設帶入 7 天後，讓頁面一打開就看得到完整時程 */
   (function seed(){
+    var q = {};
+    location.search.replace(/^\?/, "").split("&").forEach(function(kv){
+      if (!kv) return;
+      var i = kv.indexOf("=");
+      q[i < 0 ? kv : kv.slice(0, i)] = i < 0 ? "" : decodeURIComponent(kv.slice(i + 1));
+    });
+    if (q.m === "meal" || q.m === "self") state.useMeal = (q.m === "meal");
+    if (/^\d{4}-\d{2}-\d{2}$/.test(q.d || "")) { el.date.value = q.d; return; }
     var d = new Date(Date.now() + 7 * DAY);
     el.date.value = d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate());
   })();
