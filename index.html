@@ -1262,9 +1262,13 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
       });
       var mi = [
         item("", "全天", "", "改吃易暢淨低渣代餐（四餐）",
-          "<p>依盒內指示，每餐擇一加熱：<strong>微波 2 分鐘</strong>，或連鋁箔袋放入沸水<strong>隔水加熱 5 分鐘</strong>後倒出。下午點心可搭配無渣飲料。</p>" +
-          "<p><strong>四餐都必須在 16:00 前吃完</strong>，時間可依自己的作息調整。</p>" +
-          '<div class="screen-only">' + foodText(EZ_MEALS) + '</div>' + mealsHTML())
+          "<p class=\"screen-only\">依盒內指示，每餐擇一加熱：<strong>微波 2 分鐘</strong>，或連鋁箔袋放入沸水<strong>隔水加熱 5 分鐘</strong>後倒出。下午點心可搭配無渣飲料。</p>" +
+          "<p class=\"screen-only\"><strong>四餐都必須在 16:00 前吃完</strong>，時間可依自己的作息調整。</p>" +
+          "<p class=\"print-only\">每餐擇一加熱：<strong>微波 2 分鐘</strong>，或連袋<strong>隔水加熱 5 分鐘</strong>。<strong>四餐都要在 16:00 前吃完</strong>。</p>" +
+          '<div class="screen-only">' + foodText(EZ_MEALS) + '</div>' + mealsHTML() +
+          "<p><strong>除了這四餐，其他食物一律不吃</strong>，口渴時只喝無渣流質：</p>" +
+          '<div class="screen-only">' + foodText(CLEAR_FLUIDS) + '</div>' +
+          '<p class="print-only">' + CLEAR_FLUIDS.map(function(f){ return f.n; }).join("、") + '。澄清湯的料要濾掉。</p>')
       ];
       P.push({ label:"檢查前一天", date: fmtDate(dayOf(exam, -1)), items: mi.concat(eveningItems()) });
     } else {
@@ -1451,7 +1455,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
 
     if (state.useMeal) {
       el.dietTitle.textContent = "易暢淨低渣代餐";
-      el.dietSub.innerHTML = "檢查前二天照常吃，<b>只有檢查前一天</b>改吃代餐四餐，並在 16:00 前全部吃完。";
+      el.dietSub.innerHTML = "檢查前二天照常吃，<b>只有檢查前一天</b>改吃代餐四餐，並在 16:00 前全部吃完，其餘時間只喝無渣流質。";
       el.dietBody.innerHTML =
         '<div class="fboxes">' +
           '<div class="fbox">' +
