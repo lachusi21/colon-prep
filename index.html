@@ -633,6 +633,12 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   .fs-icon{width:7.6mm;height:7.6mm;margin:0 auto}
   .fs-icon svg{width:100%;height:100%;display:block}
   .fs-name{margin-top:.5mm;font-size:8.5pt;line-height:1.25}
+  /* 代餐那一格空間吃緊，同樣的橫幅縮一號 */
+  .fstrip.tight{gap:1mm;margin-top:1mm}
+  .fstrip.tight .fs-icon{width:6.4mm;height:6.4mm}
+  .fstrip.tight .fs-name{font-size:7.5pt;line-height:1.2;margin-top:.3mm}
+  .fstrip.tight .fs-name small{font-size:6.5pt}
+  .fstrip.tight .fs-card{padding:.5mm .2mm .4mm}
   .fs-name small{display:block;font-size:7.5pt;color:var(--ink-3)}
   .mstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:2mm;margin-top:2mm}
   .ms-card{border:.6pt solid var(--line);background:var(--surface-2);border-radius:1.5mm;padding:1.5mm 1mm;text-align:center;break-inside:avoid}
@@ -1112,8 +1118,8 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
   }
 
   /* 紙本用的圖示橫幅：一排幾格由 cols 決定 */
-  function foodStrip(list, cols){
-    var h = '<div class="fstrip print-only" aria-hidden="true" style="grid-template-columns:repeat(' + cols + ',1fr)">';
+  function foodStrip(list, cols, extra){
+    var h = '<div class="fstrip print-only' + (extra ? ' ' + extra : '') + '" aria-hidden="true" style="grid-template-columns:repeat(' + cols + ',1fr)">';
     list.forEach(function(f){
       h += '<div class="fs-card"><div class="fs-icon">' + ICONS[f.i] + '</div>' +
            '<div class="fs-name">' + f.n + (f.s ? '<small>' + f.s.replace(/<br>/g, '') + '</small>' : '') + '</div></div>';
@@ -1268,7 +1274,7 @@ footer{padding-block:28px 0;color:var(--ink-3);font-size:13px;line-height:1.8;bo
           '<div class="screen-only">' + foodText(EZ_MEALS) + '</div>' + mealsHTML() +
           "<p><strong>除了這四餐，其他食物一律不吃</strong>，口渴時只喝無渣流質：</p>" +
           '<div class="screen-only">' + foodText(CLEAR_FLUIDS) + '</div>' +
-          '<p class="print-only">' + CLEAR_FLUIDS.map(function(f){ return f.n; }).join("、") + '。澄清湯的料要濾掉。</p>')
+          foodStrip(CLEAR_FLUIDS, 10, 'tight'))
       ];
       P.push({ label:"檢查前一天", date: fmtDate(dayOf(exam, -1)), items: mi.concat(eveningItems()) });
     } else {
